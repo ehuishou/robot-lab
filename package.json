@@ -1,0 +1,22 @@
+{
+  "name": "robot-lab",
+  "version": "0.1.0",
+  "description": "Single-map robot transport challenge",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "node scripts/verify-single-map.mjs",
+    "test:physics": "node scripts/verify-quadruped.mjs && node scripts/verify-locomotion.mjs",
+    "test:browser": "node scripts/verify-single-map-browser.mjs"
+  },
+  "dependencies": {
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/three": "0.180.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11"
+  }
+}

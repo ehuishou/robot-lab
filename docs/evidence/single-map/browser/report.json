@@ -1,0 +1,29 @@
+{
+  "cases": [
+    "single map at root, normal by default, no difficulty picker",
+    "legacy sample query cannot open another map",
+    "real keyboard drive across sand and arch, charge, clear, deliver, score",
+    "desktop and mobile result actions remain visible and reachable",
+    "new score survives reload",
+    "mobile touch driving, portrait and landscape controls, pause",
+    "test mode shares same map"
+  ],
+  "exceptions": [],
+  "base": "http://127.0.0.1:54976",
+  "buildId": "build-19621c47609a-20261020133734963",
+  "run": {
+    "time": 100.58333333332891,
+    "energy": 31.51892445339909,
+    "result": {
+      "outcome": "succeeded",
+      "score": {
+        "formalScore": 3071,
+        "timeBonus": 441,
+        "energyBonus": 450,
+        "cargoBonus": 2000,
+        "budgetBonus": 180
+      }
+    }
+  },
+  "passed": true
+}

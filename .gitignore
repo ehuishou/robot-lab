@@ -1,0 +1,30 @@
+﻿# Dependencies and generated output
+/node_modules/
+/dist/
+*.log
+*.tar.gz
+*.zip
+*.tsbuildinfo
+
+# Local tools and workspace state
+/.claude/
+/.codex/
+/.agents/
+/codex-lan-remote-*/
+/.vscode/
+/.idea/
+Thumbs.db
+.DS_Store
+
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+
+# Keep the current version evidence; historical build/source snapshots stay local.
+/docs/evidence/*
+!/docs/evidence/single-map/

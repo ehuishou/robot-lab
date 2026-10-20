@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robot-build-id" content="__ROBOT_BUILD_ID__">
+  <meta name="robot-build-time" content="__ROBOT_BUILD_TIME__">
+  <meta name="robot-version" content="__ROBOT_VERSION__">
+  <meta name="robot-test-mode" content="__ROBOT_TEST_MODE__">
+  <meta name="robot-build-mode" content="__ROBOT_BUILD_MODE__">
+  <title>ROBOT LAB · 沙地运输场</title>
+  <style>body{margin:0;background:#0b1521;color:#dceaf5;font:16px 'Microsoft YaHei',sans-serif}#preview-startup{padding:32px}#preview-startup button{padding:12px;margin-top:16px}#preview-startup[hidden]{display:none}</style>
+</head>
+<body>
+  <div id="preview-startup" role="status"><h1>ROBOT LAB</h1><p id="preview-message">正在加载 沙地运输场…</p><pre id="preview-error" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre><button type="button" onclick="location.reload()">重新加载</button></div>
+  <div id="preview-app"></div>
+  <script>
+    window.previewStartupFailure = function(error) {
+      document.documentElement.dataset.previewState = 'error';
+      var shell = document.getElementById('preview-startup');
+      shell.hidden = false;
+      shell.setAttribute('role', 'alert');
+      document.getElementById('preview-message').textContent = '游戏加载失败，请重新加载。';
+      document.getElementById('preview-error').textContent = String(error && error.message || error);
+    };
+    window.addEventListener('error', function(event) { window.previewStartupFailure(event.error || '入口资源加载失败'); }, true);
+    window.addEventListener('unhandledrejection', function(event) { window.previewStartupFailure(event.reason); });
+    setTimeout(function() { if (!document.documentElement.dataset.previewState) window.previewStartupFailure('启动超过 30 秒，请检查浏览器 WebGL 和网络。'); }, 30000);
+  </script>
+  <script type="module" src="/src/previewBoot.ts"></script>
+</body>
+</html>

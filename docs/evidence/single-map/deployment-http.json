@@ -1,0 +1,41 @@
+{
+  "checkedAt": "2026-10-20T13:44:19.736Z",
+  "base": "http://121.199.30.133:3001",
+  "checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "buildId": "build-19621c47609a-20261020133734963"
+    },
+    {
+      "path": "/index.html",
+      "status": 200,
+      "buildId": "build-19621c47609a-20261020133734963"
+    },
+    {
+      "path": "/preview.html",
+      "status": 200,
+      "buildId": "build-19621c47609a-20261020133734963"
+    },
+    {
+      "path": "/?test=0",
+      "status": 200,
+      "buildId": "build-19621c47609a-20261020133734963"
+    },
+    {
+      "path": "/?test=1",
+      "status": 200,
+      "buildId": "build-19621c47609a-20261020133734963"
+    },
+    {
+      "path": "/assets/previewBoot-CLy9bNfF.css",
+      "status": 200,
+      "sha256": "cb477327df92e88fdff255278c93a81581b7ed5982c969ef1b9fa59048ee5a23"
+    },
+    {
+      "path": "/assets/previewBoot-DssMn-xi.js",
+      "status": 200,
+      "sha256": "b7b83114b66f7a3232dae6b62e4017c23783e0cf0ca090cf0be34dca64b4a633"
+    }
+  ]
+}
