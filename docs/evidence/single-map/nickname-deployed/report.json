@@ -1,0 +1,11 @@
+{
+  "cases": [
+    "nickname-only entry; game has no leaderboard entrance",
+    "nickname can be changed before a run",
+    "one real touch confirms nickname while keyboard collapse on blur changes viewport",
+    "short mobile viewport keeps confirm visible; keyboard Enter submits",
+    "no uncaught browser exceptions"
+  ],
+  "exceptions": [],
+  "base": "http://121.199.30.133:3001/"
+}

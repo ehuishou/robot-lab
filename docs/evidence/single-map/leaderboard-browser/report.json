@@ -2,6 +2,8 @@
   "cases": [
     "nickname-only entry; game has no leaderboard entrance",
     "nickname can be changed before a run",
+    "one real touch confirms nickname while keyboard collapse on blur changes viewport",
+    "short mobile viewport keeps confirm visible; keyboard Enter submits",
     "offline queue retries online and after reload; lower retry preserves best",
     "independent leaderboard; public view is read only",
     "admin login and edit through UI",
@@ -10,5 +12,5 @@
     "no uncaught browser exceptions"
   ],
   "exceptions": [],
-  "base": "http://127.0.0.1:60979"
+  "base": "http://127.0.0.1:64241"
 }

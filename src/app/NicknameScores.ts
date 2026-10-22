@@ -18,8 +18,20 @@ export class NicknameScores {
     } catch { /* Ignore invalid local drafts. */ }
     this.button = root.querySelector<HTMLButtonElement>('#nickname-button')!;
     this.dialog.className = 'nickname-dialog';
-    this.dialog.innerHTML = `<form id="nickname-form"><p class="eyebrow">ROBOT LAB / PLAYER</p><h2>输入你的昵称</h2><p class="muted">成绩以昵称保存，同一昵称只保留最高分。</p><label for="nickname-input">昵称（1–20 个字）</label><input id="nickname-input" name="nickname" autocomplete="nickname" maxlength="40" required><p class="muted">不需要账号或密码。昵称不是独占的，请避免和别人重名。</p><p id="nickname-error" role="alert"></p><button type="submit" class="primary">进入实验室</button></form>`;
+    this.dialog.innerHTML = `<form id="nickname-form"><div class="nickname-body"><p class="eyebrow">ROBOT LAB / PLAYER</p><h2 id="nickname-title">输入你的昵称</h2><p class="muted">成绩以昵称保存，同一昵称只保留最高分。</p><label for="nickname-input">昵称（1–20 个字）</label><input id="nickname-input" name="nickname" autocomplete="nickname" enterkeyhint="go" aria-describedby="nickname-error" maxlength="40" required><p class="muted">不需要账号或密码。昵称不是独占的，请避免和别人重名。</p><p id="nickname-error" role="alert"></p></div><div class="nickname-actions"><button type="submit" class="primary">进入实验室</button></div></form>`;
+    this.dialog.setAttribute('aria-labelledby', 'nickname-title');
     root.append(this.dialog);
+    const input = this.dialog.querySelector<HTMLInputElement>('input')!;
+    const submit = this.dialog.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    // Keep the keyboard open until click submits: blur can move the button before release.
+    const keepInputFocus = (event: MouseEvent | PointerEvent) => {
+      if (event.button === 0 && document.activeElement === input) event.preventDefault();
+    };
+    submit.addEventListener('pointerdown', keepInputFocus, { signal: this.abort.signal });
+    submit.addEventListener('mousedown', keepInputFocus, { signal: this.abort.signal });
+    window.addEventListener('resize', () => this.updateViewport(), { signal: this.abort.signal });
+    window.visualViewport?.addEventListener('resize', () => this.updateViewport(), { signal: this.abort.signal });
+    window.visualViewport?.addEventListener('scroll', () => this.updateViewport(), { signal: this.abort.signal });
     this.button.addEventListener('click', () => this.open(), {signal:this.abort.signal});
     this.dialog.addEventListener('cancel', e => { if (!this.nickname) e.preventDefault(); });
     this.dialog.querySelector('form')!.addEventListener('submit', e => {
@@ -36,7 +48,12 @@ export class NicknameScores {
     window.addEventListener('online', () => { void this.flush(); }, {signal:this.abort.signal});
     void this.flush();
   }
-  open() { this.dialog.querySelector<HTMLInputElement>('input')!.value=this.nickname; this.dialog.querySelector('#nickname-error')!.textContent=''; if (!this.dialog.open) this.dialog.showModal(); }
+  open() { this.dialog.querySelector<HTMLInputElement>('input')!.value=this.nickname; this.dialog.querySelector('#nickname-error')!.textContent=''; if (!this.dialog.open) { this.updateViewport(); this.dialog.showModal(); this.updateViewport(); } }
+  private updateViewport() {
+    const viewport = window.visualViewport;
+    this.dialog.style.setProperty('--nickname-viewport-height', `${viewport?.height ?? window.innerHeight}px`);
+    this.dialog.style.setProperty('--nickname-viewport-top', `${viewport?.offsetTop ?? 0}px`);
+  }
   update(running: boolean) { this.button.textContent=this.nickname ? this.nickname+' · 更换' : '输入昵称'; this.button.disabled=running; }
   storage(): ConfigurationStorage {
     const prefix='nickname:'+normalizeNickname(this.nickname).key+':';

@@ -1,36 +1,36 @@
 {
-  "checkedAt": "2026-10-22T14:35:56.166Z",
+  "checkedAt": "2026-10-22T15:06:20.821Z",
   "base": "http://121.199.30.133:3001",
   "checks": [
     {
       "path": "/",
       "status": 200,
-      "buildId": "build-ebfa380adf61-20261022142334460"
+      "buildId": "build-2b88074d841b-20261022150238621"
     },
     {
       "path": "/index.html",
       "status": 200,
-      "buildId": "build-ebfa380adf61-20261022142334460"
+      "buildId": "build-2b88074d841b-20261022150238621"
     },
     {
       "path": "/preview.html",
       "status": 200,
-      "buildId": "build-ebfa380adf61-20261022142334460"
+      "buildId": "build-2b88074d841b-20261022150238621"
     },
     {
       "path": "/?test=0",
       "status": 200,
-      "buildId": "build-ebfa380adf61-20261022142334460"
+      "buildId": "build-2b88074d841b-20261022150238621"
     },
     {
       "path": "/?test=1",
       "status": 200,
-      "buildId": "build-ebfa380adf61-20261022142334460"
+      "buildId": "build-2b88074d841b-20261022150238621"
     },
     {
       "path": "/leaderboard.html",
       "status": 200,
-      "buildId": "build-ebfa380adf61-20261022142334460"
+      "buildId": "build-2b88074d841b-20261022150238621"
     },
     {
       "path": "/api/health",
@@ -43,9 +43,9 @@
       "rulesVersion": "single-map-v3"
     },
     {
-      "path": "/assets/leaderboard-D7ZKKDzb.js",
+      "path": "/assets/leaderboard-C9ydbO_j.js",
       "status": 200,
-      "sha256": "93102e092874070005ebd70372ab531e9ab6477dc71615ba72c2d78d7805dc50"
+      "sha256": "ec540dd7735f7391ce0574189f38135fd7c1006c2583db9defdf0be0bd534c5a"
     },
     {
       "path": "/assets/leaderboard-xKXbFFai.css",
@@ -53,19 +53,19 @@
       "sha256": "79e387966550d06ac0726492732270716fc7696f8df5ee436e8e35a396c686ba"
     },
     {
-      "path": "/assets/preview-Ck_MKfod.css",
-      "status": 200,
-      "sha256": "c03f9350acde01c13d34fcbac271b7d671e5b4e6eaefe5d1c17122ab92e6224b"
-    },
-    {
-      "path": "/assets/preview-DKrqwSoy.js",
+      "path": "/assets/preview-BRsRGy_g.js",
       "status": 200,
       "sha256": "d2a32840421496e872ade591618d2fa5c33797605d1aec04301717e5a90757d0"
     },
     {
-      "path": "/assets/previewBoot-YdXoBwKy.js",
+      "path": "/assets/preview-Ceu-dEA_.css",
       "status": 200,
-      "sha256": "193ebc005250c7266c7b4f45feebcbcdcdcf86ec55fad7ba8496124c37032933"
+      "sha256": "731c4a3a3daeb035e872a86e18154bcf57eedc052921c42bddff4366a775ae6b"
+    },
+    {
+      "path": "/assets/previewBoot-DhG9vyJO.js",
+      "status": 200,
+      "sha256": "2647d4672fce391c3d95738461960ade29b8221dc2ecd5174fb8d2480137701f"
     }
   ]
 }

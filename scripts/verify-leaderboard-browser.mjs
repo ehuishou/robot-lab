@@ -7,7 +7,8 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 
 import { tmpdir } from 'node:os';
 import { resolve, extname, sep } from 'node:path';
 const delay = ms => new Promise(done => setTimeout(done, ms));
-const evidence = resolve('docs/evidence/single-map', 'leaderboard-browser');
+const nicknameOnlyBase = process.argv[2];
+const evidence = resolve('docs/evidence/single-map', nicknameOnlyBase ? 'nickname-deployed' : 'leaderboard-browser');
 mkdirSync(evidence, { recursive: true });
 let browser, socket, server, seq = 0;
 const pending = new Map();
@@ -60,7 +61,7 @@ try {
   }
   const path=resolve(root,'.'+(pathname==='/'?'/index.html':pathname));if(!path.startsWith(root+sep)||!existsSync(path)){res.writeHead(404);res.end();return;}
   res.writeHead(200,{'Content-Type':{'.html':'text/html; charset=utf-8','.js':'text/javascript','.css':'text/css'}[extname(path)]??'application/octet-stream'});res.end(readFileSync(path));
- });await new Promise(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+server.address().port;report.base=base;
+ });await new Promise(r=>server.listen(0,'127.0.0.1',r));const base=nicknameOnlyBase ?? 'http://127.0.0.1:'+server.address().port;report.base=base;
  const profile=mkdtempSync(resolve(tmpdir(),'robot-board-ui-'));
  browser=spawn(process.env.ROBOT_BROWSER??'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',['--headless=new','--remote-debugging-port=0','--user-data-dir='+profile,'--no-first-run','--no-default-browser-check','--disable-extensions','--window-size=1366,900','about:blank'],{windowsHide:true,stdio:'ignore'});
  browser.on('error',e=>report.browserError=e.message);await until(()=>{assert.ok(!report.browserError,report.browserError);return existsSync(resolve(profile,'DevToolsActivePort'));});
@@ -75,6 +76,52 @@ try {
  assert.equal(await evaluate("[...document.querySelectorAll('a')].some(a=>/leaderboard/i.test(a.href)) || document.body.innerText.includes('\u6392\u884c')"),false);pass('nickname-only entry; game has no leaderboard entrance');
  await click('#nickname-button');assert.equal(await evaluate("document.querySelector('.nickname-dialog').open"),true);await evaluate("document.querySelector('#nickname-input').value='QA Other';document.querySelector('#nickname-form').requestSubmit()");
  assert.equal(await evaluate("localStorage.getItem('robot_lab_nickname_v1')"),'QA Other');pass('nickname can be changed before a run');
+ await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+ await send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
+ await click('#nickname-button');
+ await evaluate(`(()=>{
+  const viewport=new EventTarget();Object.assign(viewport,{height:390,offsetTop:48});
+  window.nicknameViewportDescriptor=Object.getOwnPropertyDescriptor(window,'visualViewport');
+  // Window resize invokes the same handler as a native visual viewport resize.
+  Object.defineProperty(window,'visualViewport',{configurable:true,value:viewport});
+  const input=document.querySelector('#nickname-input');input.value='QA Touch';input.focus();
+  window.nicknameBlurCount=0;window.nicknameChangeCount=0;
+  document.querySelector('#preview-app').addEventListener('nicknamechange',()=>window.nicknameChangeCount++);
+  input.addEventListener('blur',()=>{window.nicknameBlurCount++;viewport.height=844;viewport.offsetTop=0;window.dispatchEvent(new Event('resize'));});
+  window.dispatchEvent(new Event('resize'));
+  return true;
+ })()`);
+ await delay(150);
+ const touchButton=await evaluate(`(()=>{
+  const rect=document.querySelector('#nickname-form button').getBoundingClientRect();
+  return {x:rect.x+rect.width/2,y:rect.y+rect.height/2,top:rect.top,bottom:rect.bottom};
+ })()`);
+ assert.ok(touchButton.top>=48 && touchButton.bottom<=438,'confirm stays within keyboard-sized visible viewport');
+ await screenshot('nickname-mobile-keyboard');
+ await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:touchButton.x,y:touchButton.y}]});
+ await delay(100);
+ assert.equal(await evaluate("document.activeElement.id==='nickname-input' && window.nicknameBlurCount===0"),true,'press must not dismiss keyboard before release');
+ await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+ await until(()=>evaluate("!document.querySelector('.nickname-dialog').open"),3000);
+ assert.equal(await evaluate('localStorage.getItem("robot_lab_nickname_v1")'),'QA Touch');
+ assert.equal(await evaluate('window.nicknameChangeCount'),1);
+ // Closing the dialog may blur the input, but blur must occur after successful submission.
+ assert.equal(await evaluate('window.nicknameBlurCount'),1);
+ await evaluate("Object.defineProperty(window,'visualViewport',window.nicknameViewportDescriptor);true");
+ pass('one real touch confirms nickname while keyboard collapse on blur changes viewport');
+ await click('#nickname-button');
+ await send('Emulation.setDeviceMetricsOverride',{width:390,height:300,deviceScaleFactor:1,mobile:true});
+ await delay(150);
+ assert.equal(await evaluate(`(()=>{const d=document.querySelector('.nickname-dialog').getBoundingClientRect(),b=document.querySelector('#nickname-form button').getBoundingClientRect();return d.top>=0&&d.bottom<=300&&b.top>=0&&b.bottom<=300})()`),true);
+ await evaluate("document.querySelector('#nickname-input').value='QA Enter';document.querySelector('#nickname-input').focus()");
+ await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',text:'\r',unmodifiedText:'\r',windowsVirtualKeyCode:13});
+ await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+ assert.equal(await evaluate("localStorage.getItem('robot_lab_nickname_v1')"),'QA Enter');
+ assert.equal(await evaluate("document.querySelector('.nickname-dialog').open"),false);
+ await send('Emulation.setTouchEmulationEnabled',{enabled:false});
+ await send('Emulation.clearDeviceMetricsOverride');
+ pass('short mobile viewport keeps confirm visible; keyboard Enter submits');
+ if (!nicknameOnlyBase) {
  available=false;const high=fixture('QA Player',40);
  await evaluate('localStorage.setItem("robot_lab_pending_scores_v1",'+JSON.stringify(JSON.stringify([high]))+')');
  await send('Page.navigate',{url:base});await until(()=>evaluate("document.documentElement.dataset.previewState==='ready'"));await delay(500);assert.equal(await evaluate("JSON.parse(localStorage.getItem('robot_lab_pending_scores_v1')).length"),1);
@@ -98,6 +145,7 @@ try {
  }pass('mobile portrait and landscape: no horizontal overflow, usable dialogs');
  await click('[data-action=delete]');await evaluate("document.getElementById('delete-form').requestSubmit()");await until(()=>evaluate("document.querySelectorAll('.board-row').length===0"));
  await click('#logout');await until(()=>evaluate("document.getElementById('logout').hidden"));pass('UI delete and logout');
+ }
  assert.deepEqual(report.exceptions,[]);pass('no uncaught browser exceptions');
 } finally {
  writeFileSync(resolve(evidence,'report.json'),JSON.stringify(report,null,2));
