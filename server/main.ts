@@ -10,7 +10,7 @@ import { normalizeNickname } from '../src/domain/identity/nickname';
 
 interface Entry {
   id: string; nickname: string; key: string; score: number; achievedAt: string; updatedAt: string;
-  performance: ChallengePerformance; configuration: Configuration; manual: boolean;
+  performance: ChallengePerformance | null; configuration: Configuration | null; manual: boolean;
 }
 interface Store { version: 1; rulesVersion: string; revision: number; entries: Entry[]; receipts: string[] }
 class HttpError extends Error { constructor(readonly status: number, message: string) { super(message); } }
@@ -22,7 +22,7 @@ let store: Store = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : {
 // Fail closed on malformed data or a rules upgrade; never silently replace existing scores.
 if (store.version !== 1 || store.rulesVersion !== rules.rulesVersion || !Number.isSafeInteger(store.revision)
   || !Array.isArray(store.entries) || !Array.isArray(store.receipts)
-  || store.entries.some(e => !e.id || normalizeNickname(e.nickname).key !== e.key || !Number.isSafeInteger(e.score) || e.score < 0 || e.score > 5000)
+  || store.entries.some(e => !e.id || normalizeNickname(e.nickname).key !== e.key || !Number.isSafeInteger(e.score) || (e.manual !== true && (e.score < 0 || e.score > 5000)))
   || new Set(store.entries.map(e => e.key)).size !== store.entries.length) throw new Error('Invalid or incompatible leaderboard data; restore backup or migrate explicitly.');
 function persist(next: Store) {
   const temporary = file + '.next';
@@ -64,6 +64,10 @@ async function body(req: IncomingMessage): Promise<Record<string, unknown>> {
   const text = Buffer.concat(chunks).toString('utf8');
   try { const data = JSON.parse(text); if (!data || typeof data !== 'object' || Array.isArray(data)) throw 0; return data; }
   catch { throw new HttpError(400, '请求数据无效。'); }
+}
+function manualScore(value: unknown): number {
+  if (!Number.isSafeInteger(value)) throw new HttpError(400, '分数必须是可精确保存的整数。');
+  return value as number;
 }
 function validateRun(input: Record<string, unknown>) {
   const { nickname, key } = normalizeNickname(input.nickname);
@@ -123,6 +127,17 @@ const server = createServer(async (req, res) => {
         entries: improved ? [...store.entries.filter(e => e.key !== run.key),entry] : store.entries });
       reply(res,200,{status:improved?'saved':'unchanged',bestScore:improved?run.score:prior!.score}); return;
     }
+    if (path === '/api/admin/entries' && method === 'POST') {
+      auth(req); const input = await body(req);
+      if (input.revision !== store.revision) throw new HttpError(409, '榜单已更新，请刷新后重试。');
+      const name = normalizeNickname(input.nickname), score = manualScore(input.score);
+      if (store.entries.some(e => e.key === name.key)) throw new HttpError(409, '昵称已有成绩，请使用修改功能。');
+      const now = new Date().toISOString();
+      const entry: Entry = { id: randomUUID(), ...name, score, achievedAt: now, updatedAt: now,
+        performance: null, configuration: null, manual: true };
+      persist({ ...store, revision: store.revision+1, entries: [...store.entries, entry] });
+      reply(res, 200, { ok: true }); return;
+    }
     const match = /^\/api\/admin\/entries\/([a-f0-9-]{36})$/.exec(path);
     if (match && (method === 'PATCH' || method === 'DELETE')) {
       auth(req); const input = await body(req);
@@ -133,8 +148,8 @@ const server = createServer(async (req, res) => {
       if (method === 'PATCH') {
         const name = normalizeNickname(input.nickname);
         if (entries.some(e => e.key === name.key)) throw new HttpError(409, '昵称已有成绩，请使用其他昵称或先删除重复记录。');
-        if (!Number.isSafeInteger(input.score) || (input.score as number)<0 || (input.score as number)>5000) throw new HttpError(400, '分数必须是 0–5000 的整数。');
-        entries = [...entries,{ ...entry, ...name, score: input.score as number, manual:true, updatedAt:new Date().toISOString() }];
+        const score = manualScore(input.score);
+        entries = [...entries,{ ...entry, ...name, score, manual:true, updatedAt:new Date().toISOString() }];
       }
       persist({ ...store, revision:store.revision+1, entries }); reply(res,200,{ok:true}); return;
     }

@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-22T14:27:02.247Z",
+  "checkedAt": "2026-10-22T15:26:09.368Z",
   "checks": [
     "one normalized nickname, highest only; lower/equal preserve prior record",
     "Unicode NFC identities merge",
@@ -8,6 +8,7 @@
     "management authentication and protected mutations",
     "manual edit, duplicate-name and concurrent-edit safeguards",
     "delete persists; old submission cannot resurrect deleted score",
+    "manual add/edit bypass game range; duplicate, stale, malformed and unauthorized writes rejected",
     "restart persistence, backup, no password in score data"
   ]
 }

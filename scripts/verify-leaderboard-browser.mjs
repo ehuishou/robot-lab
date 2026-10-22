@@ -132,11 +132,24 @@ try {
  board=await(await fetch(base+'/api/leaderboard')).json();assert.equal(board.entries.length,1);assert.equal(board.entries[0].score,high.score);pass('offline queue retries online and after reload; lower retry preserves best');
  await send('Page.navigate',{url:base+'/leaderboard.html'});await until(()=>evaluate("document.documentElement.dataset.leaderboardState==='ready'"));
  assert.equal(await evaluate("document.querySelectorAll('.board-row').length"),1);assert.equal(await evaluate("document.querySelectorAll('[data-action=edit]').length"),0);
- assert.equal(await evaluate("document.querySelectorAll('canvas').length"),0);await screenshot('board-desktop');pass('independent leaderboard; public view is read only');
+ assert.equal(await evaluate("document.getElementById('add-entry').hidden"),true);assert.equal(await evaluate("document.querySelectorAll('canvas').length"),0);await screenshot('board-desktop');pass('independent leaderboard; public view is read only');
  await click('#manage');await evaluate('document.getElementById("admin-password").value='+JSON.stringify(password)+';document.getElementById("admin-form").requestSubmit()');
  await until(()=>evaluate("!document.getElementById('logout').hidden && document.querySelectorAll('[data-action=edit]').length===1"));
  await click('[data-action=edit]');await evaluate("document.getElementById('edit-nickname').value='QA Edited';document.getElementById('edit-score').value='4321';document.getElementById('edit-form').requestSubmit()");await until(()=>evaluate("document.querySelector('.board-score')?.textContent==='4321'"));
  assert.equal(await evaluate("document.querySelector('.board-identity strong').textContent"),'QA Edited');await screenshot('board-admin');pass('admin login and edit through UI');
+ await click('#add-entry');
+ assert.equal(await evaluate("document.getElementById('entry-title').textContent"),'添加成绩');
+ assert.equal(await evaluate("document.getElementById('edit-score').hasAttribute('max') || document.getElementById('edit-score').hasAttribute('min')"),false);
+ await evaluate("document.getElementById('edit-nickname').value='QA Manual';document.getElementById('edit-score').value='9007199254740991';document.getElementById('edit-form').requestSubmit()");
+ await until(()=>evaluate("document.querySelector('.board-score')?.textContent==='9007199254740991'"));
+ assert.equal(await evaluate("document.querySelector('.board-metrics span').textContent"),'管理员手动成绩');
+ await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await delay(150);
+ assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true);assert.equal(await evaluate("document.querySelector('.board-score').getBoundingClientRect().height<40"),true);await screenshot('board-manual-mobile');
+ await click('[data-action=edit]');await evaluate("document.getElementById('edit-score').value='999999';document.getElementById('edit-form').requestSubmit()");
+ await until(()=>evaluate("document.querySelector('.board-score')?.textContent==='999999'"));
+ await click('[data-action=delete]');await evaluate("document.getElementById('delete-form').requestSubmit()");
+ await until(()=>evaluate("document.querySelectorAll('.board-row').length===1 && document.querySelector('.board-score')?.textContent==='4321'"));
+ pass('admin adds, edits and deletes manual scores above game maximum; mobile large score fits');
  for(const [width,height]of[[390,844],[844,390]]){
   await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await delay(200);
   assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true);await click('[data-action=edit]');

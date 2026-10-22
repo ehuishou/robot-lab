@@ -7,10 +7,11 @@
     "offline queue retries online and after reload; lower retry preserves best",
     "independent leaderboard; public view is read only",
     "admin login and edit through UI",
+    "admin adds, edits and deletes manual scores above game maximum; mobile large score fits",
     "mobile portrait and landscape: no horizontal overflow, usable dialogs",
     "UI delete and logout",
     "no uncaught browser exceptions"
   ],
   "exceptions": [],
-  "base": "http://127.0.0.1:64241"
+  "base": "http://127.0.0.1:50526"
 }

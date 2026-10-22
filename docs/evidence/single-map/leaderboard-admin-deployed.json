@@ -1,0 +1,9 @@
+{
+  "checkedAt": "2026-10-22T15:41:30.372Z",
+  "base": "http://121.199.30.133:3001",
+  "checks": [
+    "admin add score 999999 above game maximum",
+    "admin edit to maximum safe integer",
+    "delete QA entry; all original entries unchanged"
+  ]
+}

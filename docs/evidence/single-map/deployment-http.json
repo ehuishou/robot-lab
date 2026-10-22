@@ -1,36 +1,36 @@
 {
-  "checkedAt": "2026-10-22T15:06:20.821Z",
+  "checkedAt": "2026-10-22T15:41:31.526Z",
   "base": "http://121.199.30.133:3001",
   "checks": [
     {
       "path": "/",
       "status": 200,
-      "buildId": "build-2b88074d841b-20261022150238621"
+      "buildId": "build-f7bdf25ee04c-20261022153829443"
     },
     {
       "path": "/index.html",
       "status": 200,
-      "buildId": "build-2b88074d841b-20261022150238621"
+      "buildId": "build-f7bdf25ee04c-20261022153829443"
     },
     {
       "path": "/preview.html",
       "status": 200,
-      "buildId": "build-2b88074d841b-20261022150238621"
+      "buildId": "build-f7bdf25ee04c-20261022153829443"
     },
     {
       "path": "/?test=0",
       "status": 200,
-      "buildId": "build-2b88074d841b-20261022150238621"
+      "buildId": "build-f7bdf25ee04c-20261022153829443"
     },
     {
       "path": "/?test=1",
       "status": 200,
-      "buildId": "build-2b88074d841b-20261022150238621"
+      "buildId": "build-f7bdf25ee04c-20261022153829443"
     },
     {
       "path": "/leaderboard.html",
       "status": 200,
-      "buildId": "build-2b88074d841b-20261022150238621"
+      "buildId": "build-f7bdf25ee04c-20261022153829443"
     },
     {
       "path": "/api/health",
@@ -43,14 +43,14 @@
       "rulesVersion": "single-map-v3"
     },
     {
-      "path": "/assets/leaderboard-C9ydbO_j.js",
+      "path": "/assets/leaderboard-Boaa5ibq.js",
       "status": 200,
-      "sha256": "ec540dd7735f7391ce0574189f38135fd7c1006c2583db9defdf0be0bd534c5a"
+      "sha256": "9b6d7d131529bfc22613307c28c560ae9495d54d638dab06ebe12d0fa439d14c"
     },
     {
-      "path": "/assets/leaderboard-xKXbFFai.css",
+      "path": "/assets/leaderboard-CC_SHGEa.css",
       "status": 200,
-      "sha256": "79e387966550d06ac0726492732270716fc7696f8df5ee436e8e35a396c686ba"
+      "sha256": "cf541e6c4da2934ad3ad5c2aab18381c8f870d4e6a18f78c99c4d9da44e24077"
     },
     {
       "path": "/assets/preview-BRsRGy_g.js",
