@@ -1,6 +1,6 @@
 import type { MissionDefinition } from '../domain/mission/definition';
 
-export const CHALLENGE_RULES_VERSION = 'single-map-v2';
+export const CHALLENGE_RULES_VERSION = 'single-map-v3';
 /** The only playable map. Geometry, HUD, validation and scoring consume this definition. */
 export const TRANSPORT_MISSION: MissionDefinition = {
   id: 'transport-yard', name: '沙地运输场',

@@ -50,7 +50,7 @@ export const MODULES: readonly CatalogModule[] = [
       "driveDrainUnitsPerSecond": 0.5
     },
     "name": "四足底盘",
-    "description": "唯一可直行翻越拱桥的底盘；沙地仍会减速"
+    "description": "任意电机均可高效直行翻桥；沙地轻微减速"
   },
   {
     "id": "motor_low",

@@ -3,7 +3,9 @@
     "single map at root, normal by default, no difficulty picker",
     "legacy sample query cannot open another map",
     "route junction and direct choice preserve scene bounds on desktop, portrait and landscape",
-    "real keyboard drive across sand and arch, charge, clear, deliver, score",
+    "backtracking after missing the near junction restores route buttons without moving the scene",
+    "far junction can be selected while driving forward after reversing past it",
+    "low-power quadruped real keyboard drive across sand and arch, charge, clear, deliver, score",
     "desktop and mobile result actions remain visible and reachable",
     "new score survives reload",
     "native vertical swipes over category and component buttons scroll without selecting",
@@ -11,8 +13,8 @@
     "test mode shares same map"
   ],
   "exceptions": [],
-  "base": "http://127.0.0.1:58011",
-  "buildId": "build-dc3ac7b92de3-20261022124726122",
+  "base": "http://127.0.0.1:50896",
+  "buildId": "build-61f131ef67c9-20261022141417328",
   "routeBounds": {
     "before": [
       {
@@ -58,16 +60,16 @@
     ]
   },
   "run": {
-    "time": 83.24999999999656,
-    "energy": 39.49565819814692,
+    "time": 117.09999999999464,
+    "energy": 37.03460006047819,
     "result": {
       "outcome": "succeeded",
       "score": {
-        "formalScore": 3281,
-        "timeBonus": 537,
-        "energyBonus": 564,
+        "formalScore": 3188,
+        "timeBonus": 349,
+        "energyBonus": 529,
         "cargoBonus": 2000,
-        "budgetBonus": 180
+        "budgetBonus": 310
       }
     }
   },

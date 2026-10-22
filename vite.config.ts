@@ -23,7 +23,8 @@ export default defineConfig(({ command, mode }) => {
       }
     }
     collectSource('src')
-    for (const filename of ['index.html', 'preview.html', 'vite.config.ts', 'package.json', 'package-lock.json', 'tsconfig.json']) {
+    collectSource('server')
+    for (const filename of ['index.html', 'preview.html', 'leaderboard.html', 'scripts/build-server.mjs', 'tsconfig.server.json', 'vite.config.ts', 'package.json', 'package-lock.json', 'tsconfig.json']) {
       sourceHash.update(filename).update(readFileSync(join(root, filename)))
     }
     const builtAt = new Date().toISOString()
@@ -55,18 +56,20 @@ export default defineConfig(({ command, mode }) => {
     server: {
       port: 3001,
       strictPort: true,
+      proxy: { '/api': 'http://127.0.0.1:3002' },
       watch: { ignored: ['**/docs/evidence/**'] },
       headers: { 'Cache-Control': 'no-store' },
     },
     preview: {
       port: 3001,
       strictPort: true,
+      proxy: { '/api': 'http://127.0.0.1:3002' },
       headers: { 'Cache-Control': 'no-store' },
     },
     build: {
       outDir: 'dist',
       assetsDir: 'assets',
-      rollupOptions: { input: { main: join(root, 'index.html'), preview: join(root, 'preview.html') } },
+      rollupOptions: { input: { main: join(root, 'index.html'), preview: join(root, 'preview.html'), leaderboard: join(root, 'leaderboard.html') } },
     },
   }
 })

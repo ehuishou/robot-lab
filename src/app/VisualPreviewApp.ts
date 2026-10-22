@@ -1,3 +1,4 @@
+import { NicknameScores } from './NicknameScores';
 import { GameControlSelection } from '../input/GameControlSelection';
 import { beginWork, senseEnvironment, routePresentation, hasBypass, bypassBounds } from '../domain/simulation/environment';
 import { TRANSPORT_MISSION } from '../content/challenges';
@@ -30,6 +31,8 @@ export class VisualPreviewApp {
   private page: Page = 'configuration';
   private mission: MissionDefinition = MISSION;
   private recordMessage = '';
+  private runNickname = '';
+  private readonly nicknameScores: NicknameScores;
   private readonly renderer: PreviewRenderer;
   private readonly abort = new AbortController();
   private controller: DrivingSessionController | null = null;
@@ -47,7 +50,7 @@ export class VisualPreviewApp {
       if (saved.status === 'rejected') storageMessage = `未载入草稿：${saved.reason}`;
     } catch { storageMessage = '浏览器存储不可用，仍可开始任务。'; }
     root.innerHTML = `
-      <header class="topbar"><a class="brand" href="./preview.html"><span class="brand-mark">RL</span><span>ROBOT LAB</span></a><span class="muted">单地图 · 运输与能效</span></header>
+      <header class="topbar"><a class="brand" href="./preview.html"><span class="brand-mark">RL</span><span>ROBOT LAB</span></a><button id="nickname-button" type="button"></button></header>
       <nav class="page-tabs" aria-label="任务页面"><button data-page="configuration">组装</button><button data-page="world">驾驶</button><button data-page="result" disabled>结算</button><span id="mission-mode"></span></nav>
       <main class="workbench">
         <aside class="module-panel panel"><div class="panel-heading"><h1>选择组件</h1></div><div class="category-tabs" role="group" aria-label="模块类别">${MODULE_CATEGORIES.map(category => `<button data-category="${category}">${CATEGORY_NAMES[category]}</button>`).join('')}</div><div id="module-cards"></div><div class="storage-actions"><button data-action="recommended">推荐配置</button><button data-action="save">保存配置</button></div><p id="storage-message" class="muted" role="status"></p></aside>
@@ -59,7 +62,7 @@ export class VisualPreviewApp {
           <div id="hud-demo" class="hud-demo" hidden><div><span>任务时间 / 位置</span><strong id="hud-time"></strong></div><div><span>能源 / 速度</span><strong id="hud-energy"></strong><div class="energy-track"><i id="energy-fill"></i></div></div><div><span>运输目标</span><strong id="hud-objective"></strong></div><details id="physics-test" hidden><summary>物理测试</summary><button data-action="physics-push">轻推</button><button data-action="physics-topple">强推</button><button data-action="physics-reset">扶正</button><button data-action="physics-overlay" aria-pressed="false">显示受力</button><span id="physics-legend" hidden>橙：重心 · 青：支撑力 · 红：打滑</span></details><div id="interaction-prompt" class="control-legend" role="status" aria-live="polite"></div></div>
           <div id="driving-panel" class="driving-panel" hidden><div class="driving-buttons" role="group" aria-label="驾驶操作"><div class="drive-cluster" role="group" aria-label="方向"><button data-drive="reverse" aria-label="按住倒退" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">←</span><span>倒退</span><kbd>A / ←</kbd></button><button data-drive="forward" aria-label="按住前进" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">→</span><span>前进</span><kbd>D / →</kbd></button></div><div class="drive-cluster drive-actions" role="group" aria-label="制动与交互"><button data-drive="brake" aria-label="按住刹车" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">▣</span><span>刹车</span><kbd>Space</kbd></button><button data-drive="interact" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">◇</span><span id="interaction-label">交互</span><kbd>E</kbd></button></div></div><div id="environment-controls" class="environment-controls" hidden><span id="route-status"></span><div class="route-choice" role="group" aria-label="选择路线"><button data-action="route-direct">↑ 直行</button><button data-action="route-bypass">↗ 走旁路 <small id="bypass-distance"></small></button></div><div class="route-tools"><button data-action="work">作业 / 充电</button><button data-action="stage">暂存货物</button><button data-action="assist">辅助：开</button></div></div><p><span>按住方向行驶 · 松开滑行</span><span>刹车停靠 · 点击交互装卸</span></p></div>
           <div id="pause-overlay" class="pause-overlay" hidden><h2>任务已暂停</h2><button class="primary" data-action="resume">继续驾驶</button><button data-action="retry">重新开始</button><button data-page="configuration">返回配置</button></div>
-          <div id="result-demo" class="result-demo" hidden><h2 id="result-title">任务结算</h2><p id="result-reason"></p><div class="result-row"><span>货物交付</span><strong id="result-delivery"></strong></div><div class="result-row"><span>到达终点</span><strong id="result-finish"></strong></div><div class="result-row"><span>耗时 / 剩余能源</span><strong id="result-metrics"></strong></div><div id="challenge-result" class="challenge-result" hidden></div><p id="record-status" class="muted"></p><div class="result-actions"><button class="primary" data-action="retry">重新挑战</button><button data-page="configuration">返回配置</button></div></div>
+          <div id="result-demo" class="result-demo" hidden><h2 id="result-title">任务结算</h2><p id="result-reason"></p><div class="result-row"><span>货物交付</span><strong id="result-delivery"></strong></div><div class="result-row"><span>到达终点</span><strong id="result-finish"></strong></div><div class="result-row"><span>耗时 / 剩余能源</span><strong id="result-metrics"></strong></div><div id="challenge-result" class="challenge-result" hidden></div><p id="record-status" class="muted" role="status"></p><button data-action="retry-score">重试保存</button><div class="result-actions"><button class="primary" data-action="retry">重新挑战</button><button data-page="configuration">返回配置</button></div></div>
         </section>
         <aside class="inspection-panel panel"><h2 id="mission-title"></h2><div id="mission-route" class="mission-route"></div><div id="budget-summary" class="budget-summary" role="status"></div><p id="best-score" class="muted"></p><details class="mission-help"><summary>评分规则</summary><p class="muted">时间 ${SCORE_WEIGHTS.time} · 电量 ${SCORE_WEIGHTS.energy} · 交付 ${SCORE_WEIGHTS.cargo} · 预算 ${SCORE_WEIGHTS.budget}。时间、电量和预算按剩余比例计分；货物交付后获得运输分。</p></details><div class="section-label">性能</div><div id="metrics" class="metrics"></div><div id="validation" role="status"></div><button id="start-session" class="primary" data-action="start">开始运输任务 →</button><details class="mission-help"><summary>操作与任务说明</summary><p class="muted" id="mission-description"></p><p class="muted demo-note" id="mission-note"></p></details></aside>
       </main><footer class="preview-footer"><div id="selected-summary" hidden></div><details><summary>版本信息</summary><code id="build-identity"></code></details></footer>`;
@@ -69,6 +72,8 @@ export class VisualPreviewApp {
     this.renderer.onFrame = timestampMs => this.advanceFrame(timestampMs);
     root.addEventListener('click', event => this.handleClick(event), { signal: this.abort.signal });
     this.controlSelection = new GameControlSelection(root);
+    this.nicknameScores = new NicknameScores(root);
+    root.addEventListener('nicknamechange',()=>this.refresh(),{signal:this.abort.signal});
     this.refresh();
   }
 
@@ -88,6 +93,7 @@ export class VisualPreviewApp {
     if (this.disposed) return;
     this.disposed = true;
     this.abort.abort();
+    this.nicknameScores.dispose();
     this.controlSelection.dispose();
     this.endSession();
     this.renderer.dispose();
@@ -142,6 +148,7 @@ export class VisualPreviewApp {
       case 'work': this.controller?.action({kind:'work'}); break;
       case 'stage': if(this.controller)this.controller.action({kind:'stage',cargoIds:this.controller.state.cargo.carried.map(c=>c.id)});break;
       case 'assist': if(this.controller?.state.environment)this.controller.action({kind:'assist',enabled:!this.controller.state.environment.assist});break;
+      case 'retry-score': this.submitScore(); break;
       case 'start': case 'retry': this.startSession(); break;
       case 'pause': this.pauseSession(); break;
       case 'physics-overlay': {
@@ -178,9 +185,11 @@ export class VisualPreviewApp {
   }
 
   private startSession(): void {
+    if (!this.nicknameScores.nickname) {this.nicknameScores.open();return;}
     if (!validateConfiguration(this.configuration, PREVIEW_MODULES, this.mission.configurationRules).valid) return;
     this.endSession();
     this.recordMessage = '';
+    this.runNickname = this.nicknameScores.nickname;
     const { state } = createMissionSession((globalThis.crypto?.randomUUID?.() ?? `session-${Date.now()}-${Math.random().toString(36).slice(2)}`), this.mission, this.configuration, PREVIEW_MODULES, PREVIEW_ASSETS);
     this.controller = new DrivingSessionController(state);
     this.browserInput = new BrowserDrivingInput(this.root, this.controller.input,
@@ -219,8 +228,9 @@ export class VisualPreviewApp {
     if (frame.steps) this.renderer.setSnapshot(createRenderSnapshot(this.controller.state));
     if (this.controller.state.result) {
       let saved: ReturnType<typeof saveChallengeResult> = 'unavailable';
-      try { saved = saveChallengeResult(localStorage, this.controller.state); } catch { /* Storage may be disabled. */ }
-      this.recordMessage = saved === 'saved' ? '已保存本地图最高分' : saved === 'unavailable' ? '成绩未能保存；本局结果仍可查看' : saved === 'unchanged' ? '未超过本地图最高分' : '';
+      try { saved = saveChallengeResult(this.nicknameScores.storage(), this.controller.state); } catch { /* Storage may be disabled. */ }
+      this.recordMessage = saved === 'excluded' ? '' : '正在保存成绩…';
+      this.submitScore();
       this.page = 'result';
       this.browserInput?.clear();
       this.refresh();
@@ -231,7 +241,15 @@ export class VisualPreviewApp {
     }
   }
 
+  private submitScore(): void {
+    const state=this.controller?.state;
+    if (!state?.result || state.phase!=='succeeded' || state.challenge?.testMode) return;
+    this.recordMessage='正在保存成绩…';
+    void this.nicknameScores.submit(state,this.runNickname).then(message=>{if(!this.disposed && this.controller?.state.sessionId===state.sessionId){this.recordMessage=message;this.refreshSession();}});
+  }
+
   private refreshSession(): void {
+    this.nicknameScores.update(this.controller?.state.phase==='running' || this.controller?.state.phase==='paused');
     const state = this.controller?.state;
     this.element('hud-demo').hidden = !state || this.page !== 'world';
     this.element('driving-panel').hidden = !state || this.page !== 'world' || !!state.result;
@@ -291,8 +309,11 @@ export class VisualPreviewApp {
     if (!delivered && state.cargo.carried.length && canLoadNext) this.element('hud-objective').textContent = '已交 '+deliveredCount+'/'+targets.length+' · 前往 '+nextCargo.xM+' m装载';
     const bridge = state.mission.environment?.sections.find(s=>s.kind==='bridge');
     const bridgeBounds = bridge ? bypassBounds(bridge) : null;
-    const approachingBridge = bridgeBounds && state.xM>=bridgeBounds.startM-8 && state.xM<=bridgeBounds.startM;
-    const routeHint = approachingBridge ? (state.configuration.chassis==='chassis_quadruped' ? '前方分岔：四足可直行翻桥，或选平地旁路' : '前方分岔：请减速选择平地旁路，拱桥仅限四足') : null;
+    const approachingBridge = bridgeBounds && (state.environment?.travelDirection===-1
+      ? state.xM>=bridgeBounds.endM && state.xM<=bridgeBounds.endM+8
+      : state.xM>=bridgeBounds.startM-8 && state.xM<=bridgeBounds.startM);
+    const atBridgeJunction = bridge && state.environment && routePresentation(state.mission.environment!,state.environment,state.xM).junction?.id===bridge.id;
+    const routeHint = atBridgeJunction ? '分岔检测点：前进或倒车均可选路，减速后选择直行或旁路' : approachingBridge ? (state.configuration.chassis==='chassis_quadruped' ? '前方分岔：四足可直行翻桥，或选平地旁路' : '前方分岔：请减速选择平地旁路，拱桥仅限四足') : null;
     const finishHint = state.xM>=this.mission.layout.find(item=>item.kind==='deliveryZone')!.startM ? '终点 '+this.finishObjective.xM+' m · 继续前进，驶过终点结算' : null;
     const prompt = interaction?.kind === 'deliver' ? 'E / 交互：卸货到交付平台' : interaction?.kind === 'pickup' ? `E / 交互：装载 ${interactionCargo?.cargo.massKg ?? ''} kg 货箱`
       : state.phase === 'paused' ? '任务已暂停' : routeHint ?? finishHint ?? 'Space 刹车 · E 交互';
@@ -307,6 +328,7 @@ export class VisualPreviewApp {
     this.element('result-metrics').textContent = `${state.elapsedSeconds.toFixed(1)} s / ${state.energyRemainingUnits.toFixed(1)}`;
     this.element('challenge-result').hidden = !state.challenge;
     this.element('record-status').textContent = this.recordMessage;
+    this.root.querySelector<HTMLButtonElement>('[data-action="retry-score"]')!.hidden=state?.phase!=='succeeded' || !!state.challenge?.testMode;
     if (state.challenge && state.result.score) {
       const c = state.challenge, score = state.result.score;
       this.element('challenge-result').innerHTML = '<div class="result-row"><span>预算 / 配置成本 / 剩余</span><strong>'+c.budget+' / '+c.configurationCost+' / '+c.remainingBudget+'</strong></div>'
@@ -351,7 +373,7 @@ export class VisualPreviewApp {
       this.element('budget-summary').textContent = TEST_MODE ? '测试模式 · 预算 '+challenge.budget+' · 配置原价 '+cost+' · 不计正式成绩'
         : '预算 '+challenge.budget+' · 已用 '+cost+' · 剩余 '+(challenge.budget-cost);
       this.element('budget-summary').dataset.over = String(!TEST_MODE && cost>challenge.budget);
-      try { const best=readBestScore(localStorage,this.mission.id,challenge);this.element('best-score').textContent=best===null?'尚无正式成绩':'最高分 '+best; }
+      try { const best=readBestScore(this.nicknameScores.storage(),this.mission.id,challenge);this.element('best-score').textContent=best===null?'尚无正式成绩':'最高分 '+best; }
       catch {this.element('best-score').textContent='本地成绩不可读取';}
     }
 

@@ -1,24 +1,22 @@
-# 部署单地图版本
+# 发布游戏与独立排行榜
 
-当前本地规则为 single-map-v2。根地址、index.html 和 preview.html 都打开同一游戏，默认正式模式；?test=1开启独立测试模式。当前实际线上构建及回滚目标见 DEPLOYED.md。
+规则 `single-map-v3`。游戏根地址、`index.html`、`preview.html` 使用同一地图；`leaderboard.html` 为独立榜单，游戏无入口。实际构建及回滚见 `DEPLOYED.md`。
 
-## 构建与验收
+先运行 README/TESTING 列出的构建与全部验证。发布前用安全随机值生成至少16字符管理密码，保存于忽略的 `deploy/.leaderboard-admin-password.txt`。首次部署会安装至服务器私有目录；后续发布保留既有密码，不重新生成覆盖。
 
-运行 npm run build、npm test、npm run test:physics、npm run test:browser。正常发布时不设置 ROBOT_LAB_TEST_MODE；如需默认测试模式，构建前将该环境变量设为1。配置存档沿用 robot_lab_preview_v1 / robot_lab_preview_test_v1，正式成绩按规则版本隔离。
+上传已验证的 `dist/`、`dist-server/`、`deploy/update.sh`、`deploy/nginx.conf`，首次新增API时还需安全传输密码文件，放入独立临时上传目录。从该目录运行 `bash deploy/update.sh`。`install.sh` 只负责首次安装入口，内部共用更新脚本。
 
-## 更新已有服务器
+- Nginx沿用 `robot-lab` 容器和主机3001端口。
+- 静态文件：`/opt/robot-lab/releases/<build-id>/`，`current` 原子切换。
+- API程序：`/opt/robot-lab/services/<build-id>/server.mjs`，不在公开静态目录；Node22容器 `robot-lab-api-<build-id>` 无外部端口，经私有Docker网络由Nginx代理 `/api/`。
+- 成绩：`/opt/robot-lab/data/leaderboard.json`，写入后备份 `.bak`；发布/回滚保留数据。`ROBOT_DATA_DIR` 指向此目录。
+- 管理密码：`/opt/robot-lab/secrets/admin-password`，目录700、文件600；`ROBOT_ADMIN_PASSWORD_FILE` 指向只读挂载。不得提交密码、成绩数据或上传包至公开仓库。
+- 新旧API仅允许一个写入者；更新时先停止旧API，再启动新API读取既有数据。短暂不可用时游戏会暂存待上传成绩。
+- 脚本备份原Nginx配置并原位写入，保留已有绑定挂载；自动检查API、Nginx及页面，失败恢复旧配置、旧静态版本和旧API。旧API停止保留用于回滚。
+- 保留旧哈希资源，兼容仍打开的页面；服务器不自动清理旧发布。
 
-上传已验证的 dist/ 与 deploy/ 到独立临时目录，从该目录运行 bash deploy/update.sh。已有 robot-lab 容器时使用更新脚本；install.sh仅用于首次部署。
+发布后执行 `node deploy/verify-release.mjs` 和 `node scripts/verify-single-map-browser.mjs http://121.199.30.133:3001/`。公网驾驶会提交专用QA昵称成绩，验收后管理员只删除该测试纪录。
 
-- 容器 robot-lab 将主机3001映射到Nginx的80端口。
-- 发布目录为 /opt/robot-lab/releases/<build-id>/，current符号链接指向当前版本。
-- update.sh验证现有容器与Nginx配置，建立新发布目录，再原子切换current。
-- 为兼容仍打开的旧页面，保留旧哈希静态资源；旧发布目录也保留用于回滚。
-- HTTP构建ID检查失败时自动恢复原current。
+管理入口：直接访问 `http://121.199.30.133:3001/leaderboard.html`，点击管理并输入本地密码文件的值。支持修改昵称/分数及删除，分数0–5000，昵称冲突和多人同时修改会提示刷新。密码可通过原位修改服务器私有文件后重启当前API来轮换，重启会使既有管理会话失效。
 
-更新后执行 node deploy/verify-release.mjs 校验5个入口及JS/CSS哈希，并执行 node scripts/verify-single-map-browser.mjs http://121.199.30.133:3001/ 做公网浏览器验收。线上测试只在浏览器独立配置中保存成绩。
-
-首次部署：在上传目录运行 bash deploy/install.sh。脚本要求root和空闲3001端口，会创建Nginx容器及防火墙规则。Nginx配置见 nginx.conf。
-
-手动回滚：按 DEPLOYED.md 中记录的旧发布路径创建临时符号链接，并用 mv -Tf 替换 /opt/robot-lab/current。切换后再次检查HTTP构建ID。
-
+手动回滚须同时恢复静态、Nginx配置和对应API，确保只运行一个写入者，具体目标见 `DEPLOYED.md`。不要回滚或删除持久化成绩；规则变更需显式迁移，API不会静默抹除不兼容数据。

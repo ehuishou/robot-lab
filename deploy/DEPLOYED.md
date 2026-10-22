@@ -1,3 +1,32 @@
+# 2026-10-22 昵称计分与独立排行榜版部署记录
+
+- 游戏地址：http://121.199.30.133:3001/；独立排行榜：http://121.199.30.133:3001/leaderboard.html。游戏内无排行榜入口。
+- 当前构建：build-ebfa380adf61-20261022142334460；规则 single-map-v3；Git版本标签 single-map-v3。
+- 上一构建：build-dc3ac7b92de3-20261022124726122（single-map-v2），发布目录保留。
+- 本次更新：前进、倒车均可在分岔检测区选路；全部电机的四足均可高效率翻桥；昵称进入与正式成绩保存；同一规范化昵称仅保留最高分；排行榜支持密码登录后修改与删除。教程开发暂停，测试模式入口沿用上一版本。
+- 上传包SHA-256：5a463bdb2058df054676f21a523d4c24a39aca03a872add8736a3d91e1d93b66。远端校验后通过 deploy/update.sh 发布。
+- 静态发布目录：/opt/robot-lab/releases/build-ebfa380adf61-20261022142334460，current已指向该版本；现有robot-lab容器与3001端口继续使用。
+- API目录：/opt/robot-lab/services/build-ebfa380adf61-20261022142334460；容器robot-lab-api-build-ebfa380adf61-20261022142334460。API通过Docker内部网络由Nginx代理，无额外公网端口；api-current记录当前容器。
+- 数据保存在/opt/robot-lab/data，管理密码保存在/opt/robot-lab/secrets/admin-password；两个目录权限700，密码文件600。凭据、数据和后端源码均不在静态站点根目录。本地密码文件deploy/.leaderboard-admin-password.txt已被Git忽略。
+- 公网6个页面入口HTTP200且构建ID一致，2个API检查通过，全部5个JS/CSS资源与本地SHA-256一致，见docs/evidence/single-map/deployment-http.json。
+- 公网浏览器11项通过，无未捕获JavaScript异常。低功耗电机四足完成翻桥、充能、清障、交付及正式计分：3374分，92.0秒，剩余能量40.3411632348。倒车返回分岔后可重新选路；手机横竖屏场景布局稳定。
+- 公网排行榜5组验收通过：真实成绩保存、同昵称最高分、匿名修改被拒绝、管理员修改、专用QA成绩删除及退出登录。只清理QA-browser测试记录，未修改其他玩家数据。见docs/evidence/single-map/leaderboard-deployed.json。
+- Nginx发布前配置备份：/opt/robot-lab/nginx.before-build-ebfa380adf61-20261022142334460.conf。更新及回滚必须原位写入nginx.conf以保留容器绑定挂载的inode。
+
+回滚至v2时需要同时回滚静态站点和代理配置。以下为需要时执行的命令，本次发布未执行回滚；数据与密码目录应保留：
+
+```sh
+docker stop robot-lab-api-build-ebfa380adf61-20261022142334460
+ln -s releases/build-dc3ac7b92de3-20261022124726122 /opt/robot-lab/current.rollback
+mv -Tf /opt/robot-lab/current.rollback /opt/robot-lab/current
+cat /opt/robot-lab/nginx.before-build-ebfa380adf61-20261022142334460.conf > /opt/robot-lab/nginx.conf
+docker exec robot-lab nginx -t
+docker exec robot-lab nginx -s reload
+mv /opt/robot-lab/api-current /opt/robot-lab/api-current.v3-rollback
+```
+
+v2没有API服务，移出api-current可避免下次部署把已停用的v3服务误当成上一版本。后续再次发布v3时可复用保留的数据和密码。
+
 # 2026-10-22 单地图操作与平衡优化版部署记录
 
 - 访问地址：http://121.199.30.133:3001/

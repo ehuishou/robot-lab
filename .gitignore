@@ -28,3 +28,7 @@ id_ed25519*
 # Keep the current version evidence; historical build/source snapshots stay local.
 /docs/evidence/*
 !/docs/evidence/single-map/
+
+/dist-server/
+/data/
+/deploy/.leaderboard-admin-password.txt

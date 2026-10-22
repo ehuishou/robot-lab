@@ -35,6 +35,7 @@ async function preview(url) {
     assert.notEqual(state, 'error', await evaluate('document.getElementById("preview-error")?.textContent'));
     return state === 'ready';
   });
+  await evaluate(`(()=>{if(document.querySelector('.nickname-dialog')?.open){document.querySelector('#nickname-input').value='QA-browser';document.querySelector('#nickname-form').requestSubmit();}return true})()`);
 }
 async function screenshot(name) {
   const shot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
@@ -94,7 +95,7 @@ try {
   assert.equal(await evaluate('document.body.innerText.includes("\u96be\u5ea6\u9009\u62e9")'),false);
   await shot('desktop-configuration');pass('single map at root, normal by default, no difficulty picker');
   await preview(report.base+'/preview.html?sample=1');assert.equal((await diagnostics()).missionId,'transport-yard');pass('legacy sample query cannot open another map');
-  await click('[data-module="chassis_quadruped"]');await click('[data-category="motor"]');await click('[data-module="motor_high"]');
+  await click('[data-module="chassis_quadruped"]');await click('[data-category="motor"]');await click('[data-module="motor_low"]');
   assert.equal((await diagnostics()).validation.valid,true);
   await click('[data-action="start"]');await go(24);await shot('desktop-sand');
   assert.equal(await evaluate('document.querySelector("[data-action=route-bypass]").hidden'),true);
@@ -118,8 +119,18 @@ try {
   await go(56);const after=await routeBoxes();
   assert.deepEqual(during,before);assert.deepEqual(after,before);report.routeBounds={before,during,after};
   pass('route junction and direct choice preserve scene bounds on desktop, portrait and landscape');
+  await go(54);
+  assert.ok((await evaluate('document.getElementById("interaction-prompt").textContent')).includes('\u524d\u8fdb\u6216\u5012\u8f66'));
+  await click('[data-action="route-bypass"]');assert.equal((await diagnostics()).session.environment.choices.bridge,'bypass');
+  await click('[data-action="route-direct"]');assert.deepEqual(await routeBoxes(),before);
+  await shot('desktop-junction-reverse');
+  pass('backtracking after missing the near junction restores route buttons without moving the scene');
   await go(66);await shot('desktop-bridge');
   assert.ok((await diagnostics()).session.heightM>.7);await go(78);await shot('desktop-bridge-exit');
+  await go(76);await go(78);
+  await click('[data-action="route-bypass"]');assert.equal((await diagnostics()).session.environment.choices.bridge,'bypass');
+  await click('[data-action="route-direct"]');
+  pass('far junction can be selected while driving forward after reversing past it');
   await go(84.15);await shot('desktop-large-box');await work();assert.equal((await diagnostics()).session.environment.removed.debris,1);await shot('desktop-cleared-box');
   await go(95);await interact();assert.equal((await diagnostics()).session.cargo.delivered.length,1);
   assert.ok((await evaluate('document.getElementById("interaction-prompt").textContent')).includes('终点'));
@@ -127,7 +138,7 @@ try {
   await go(100);await shot('desktop-result');
   const s=(await diagnostics()).session;assert.equal(s.result.score.cargoBonus,2000);assert.ok(s.result.score.formalScore>2000);
   assert.equal(await evaluate('document.querySelectorAll("#challenge-result .result-row").length'),6);
-  report.run={time:s.elapsedSeconds,energy:s.energyRemainingUnits,result:s.result};pass('real keyboard drive across sand and arch, charge, clear, deliver, score');
+  report.run={time:s.elapsedSeconds,energy:s.energyRemainingUnits,result:s.result};pass('low-power quadruped real keyboard drive across sand and arch, charge, clear, deliver, score');
   for(const [width,height] of [[1366,900],[390,844],[844,390]]){
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<1000});await delay(250);
     const bounds=await evaluate(`(()=>{const panel=document.getElementById('result-demo'),button=panel.querySelector('.result-actions button');panel.scrollTop=panel.scrollHeight;const p=panel.getBoundingClientRect(),b=button.getBoundingClientRect();return{top:p.top,bottom:p.bottom,buttonTop:b.top,buttonBottom:b.bottom,visible:button.contains(document.elementFromPoint(b.x+b.width/2,b.y+b.height/2))}})()`);

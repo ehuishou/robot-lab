@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-10-22T14:38:44.779Z",
+  "base": "http://121.199.30.133:3001",
+  "checks": [
+    "real public keyboard run persisted its formal score",
+    "same normalized nickname retains only highest score on production",
+    "public visitors cannot change leaderboard records",
+    "admin authentication and edit work behind production proxy",
+    "only dedicated QA record deleted; admin logout invalidates session"
+  ]
+}

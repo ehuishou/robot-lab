@@ -1,41 +1,71 @@
 {
-  "checkedAt": "2026-10-22T13:15:49.758Z",
+  "checkedAt": "2026-10-22T14:35:56.166Z",
   "base": "http://121.199.30.133:3001",
   "checks": [
     {
       "path": "/",
       "status": 200,
-      "buildId": "build-dc3ac7b92de3-20261022124726122"
+      "buildId": "build-ebfa380adf61-20261022142334460"
     },
     {
       "path": "/index.html",
       "status": 200,
-      "buildId": "build-dc3ac7b92de3-20261022124726122"
+      "buildId": "build-ebfa380adf61-20261022142334460"
     },
     {
       "path": "/preview.html",
       "status": 200,
-      "buildId": "build-dc3ac7b92de3-20261022124726122"
+      "buildId": "build-ebfa380adf61-20261022142334460"
     },
     {
       "path": "/?test=0",
       "status": 200,
-      "buildId": "build-dc3ac7b92de3-20261022124726122"
+      "buildId": "build-ebfa380adf61-20261022142334460"
     },
     {
       "path": "/?test=1",
       "status": 200,
-      "buildId": "build-dc3ac7b92de3-20261022124726122"
+      "buildId": "build-ebfa380adf61-20261022142334460"
     },
     {
-      "path": "/assets/previewBoot-DHl-CDXJ.js",
+      "path": "/leaderboard.html",
       "status": 200,
-      "sha256": "2338e01f9b130e3b87a546fb31660cca20aa3fd839d6e93c818d66b9c66c4b4f"
+      "buildId": "build-ebfa380adf61-20261022142334460"
     },
     {
-      "path": "/assets/previewBoot-ndjSvycE.css",
+      "path": "/api/health",
       "status": 200,
-      "sha256": "325a7c87d71ae18c1af82cc84ea11f23ae405024ac5e0fc45b34b556737cd6da"
+      "rulesVersion": "single-map-v3"
+    },
+    {
+      "path": "/api/leaderboard",
+      "status": 200,
+      "rulesVersion": "single-map-v3"
+    },
+    {
+      "path": "/assets/leaderboard-D7ZKKDzb.js",
+      "status": 200,
+      "sha256": "93102e092874070005ebd70372ab531e9ab6477dc71615ba72c2d78d7805dc50"
+    },
+    {
+      "path": "/assets/leaderboard-xKXbFFai.css",
+      "status": 200,
+      "sha256": "79e387966550d06ac0726492732270716fc7696f8df5ee436e8e35a396c686ba"
+    },
+    {
+      "path": "/assets/preview-Ck_MKfod.css",
+      "status": 200,
+      "sha256": "c03f9350acde01c13d34fcbac271b7d671e5b4e6eaefe5d1c17122ab92e6224b"
+    },
+    {
+      "path": "/assets/preview-DKrqwSoy.js",
+      "status": 200,
+      "sha256": "d2a32840421496e872ade591618d2fa5c33797605d1aec04301717e5a90757d0"
+    },
+    {
+      "path": "/assets/previewBoot-YdXoBwKy.js",
+      "status": 200,
+      "sha256": "193ebc005250c7266c7b4f45feebcbcdcdcf86ec55fad7ba8496124c37032933"
     }
   ]
 }

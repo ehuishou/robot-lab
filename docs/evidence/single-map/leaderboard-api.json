@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-10-22T14:27:02.247Z",
+  "checks": [
+    "one normalized nickname, highest only; lower/equal preserve prior record",
+    "Unicode NFC identities merge",
+    "idempotent repeated submission",
+    "invalid, old, test, forged and cross-origin payloads rejected",
+    "management authentication and protected mutations",
+    "manual edit, duplicate-name and concurrent-edit safeguards",
+    "delete persists; old submission cannot resurrect deleted score",
+    "restart persistence, backup, no password in score data"
+  ]
+}

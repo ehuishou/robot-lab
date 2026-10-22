@@ -4,11 +4,14 @@
   "description": "Single-map robot transport challenge",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && tsc -p tsconfig.server.json && vite build && node scripts/build-server.mjs",
     "preview": "vite preview",
     "test": "node scripts/verify-single-map.mjs",
     "test:physics": "node scripts/verify-quadruped.mjs && node scripts/verify-locomotion.mjs",
-    "test:browser": "node scripts/verify-single-map-browser.mjs"
+    "test:browser": "node scripts/verify-single-map-browser.mjs",
+    "start:api": "node dist-server/server.mjs",
+    "test:leaderboard": "node scripts/verify-leaderboard.mjs",
+    "test:leaderboard:browser": "node scripts/verify-leaderboard-browser.mjs"
   },
   "dependencies": {
     "three": "0.180.0"

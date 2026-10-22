@@ -3,6 +3,9 @@
     "current configuration storage roundtrip and corrupt-save rejection",
     "one map, valid layout, real branch clearances",
     "sand cannot be selected as a bypass; bridge is exclusive in both directions",
+    "both junctions accept either direction after passing and reversing; branch interior is locked",
+    "pickup, charge, clear, delivery and staging remain available after reversing",
+    "all quadruped motors cross the arch faster than bypass, loaded and in reverse",
     "shared arch rises and falls; bypass remains flat",
     "every chassis slows in sand, tracks lose the smallest speed fraction",
     "all four score components, failed and test exclusions",
@@ -14,6 +17,92 @@
     "empty arrival scores without transport bonus; blade clears one box",
     "scores survive reload, isolate rule versions and exclude test mode",
     "time and energy failures settle at zero; pause holds simulation"
+  ],
+  "bridgeRuns": [
+    {
+      "motor": "motor_low",
+      "heavy": false,
+      "times": {
+        "direct": {
+          "forward": 14.000000000000295,
+          "reverse": 14.999999999999147
+        },
+        "bypass": {
+          "forward": 14.33333333333361,
+          "reverse": 21.933333333332087
+        }
+      }
+    },
+    {
+      "motor": "motor_low",
+      "heavy": true,
+      "times": {
+        "direct": {
+          "forward": 16.99999999999937,
+          "reverse": 17.599999999999
+        },
+        "bypass": {
+          "forward": 18.666666666665943,
+          "reverse": 26.46666666666517
+        }
+      }
+    },
+    {
+      "motor": "motor_standard",
+      "heavy": false,
+      "times": {
+        "direct": {
+          "forward": 13.300000000000331,
+          "reverse": 15.233333333332467
+        },
+        "bypass": {
+          "forward": 15.13333333333356,
+          "reverse": 21.833333333332092
+        }
+      }
+    },
+    {
+      "motor": "motor_standard",
+      "heavy": true,
+      "times": {
+        "direct": {
+          "forward": 14.5333333333331,
+          "reverse": 17.299999999999017
+        },
+        "bypass": {
+          "forward": 17.633333333332924,
+          "reverse": 26.366666666665175
+        }
+      }
+    },
+    {
+      "motor": "motor_high",
+      "heavy": false,
+      "times": {
+        "direct": {
+          "forward": 13.333333333333616,
+          "reverse": 15.133333333332473
+        },
+        "bypass": {
+          "forward": 15.50000000000016,
+          "reverse": 21.833333333332092
+        }
+      }
+    },
+    {
+      "motor": "motor_high",
+      "heavy": true,
+      "times": {
+        "direct": {
+          "forward": 14.399999999999764,
+          "reverse": 17.499999999999005
+        },
+        "bypass": {
+          "forward": 17.76666666666624,
+          "reverse": 26.566666666665164
+        }
+      }
+    }
   ],
   "runs": [
     {
@@ -51,13 +140,13 @@
       "carry": true,
       "bridge": "direct",
       "blade": false,
-      "time": 59.299999999999194,
-      "energy": 47.70062851610342,
-      "maxTiltDegrees": 17.91776091509519,
+      "time": 57.36666666666597,
+      "energy": 47.8142708993294,
+      "maxTiltDegrees": 10.41595153962417,
       "score": {
-        "formalScore": 3531,
-        "timeBonus": 670,
-        "energyBonus": 681,
+        "formalScore": 3544,
+        "timeBonus": 681,
+        "energyBonus": 683,
         "cargoBonus": 2000,
         "budgetBonus": 180
       }
@@ -67,13 +156,13 @@
       "carry": true,
       "bridge": "direct",
       "blade": true,
-      "time": 61.96666666666571,
-      "energy": 73.86550482625267,
-      "maxTiltDegrees": 10.195586221966677,
+      "time": 60.06666666666582,
+      "energy": 73.93256344249941,
+      "maxTiltDegrees": 10.951365552548431,
       "score": {
-        "formalScore": 3413,
-        "timeBonus": 655,
-        "energyBonus": 738,
+        "formalScore": 3425,
+        "timeBonus": 666,
+        "energyBonus": 739,
         "cargoBonus": 2000,
         "budgetBonus": 20
       }

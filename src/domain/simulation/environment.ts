@@ -37,6 +37,7 @@ export interface EnvironmentState {
 }
 export const ENERGY_MODEL_VERSION = 'work-loss-v2.3';
 export const QUADRUPED_SOIL_FRICTION = .6;
+export const QUADRUPED_BRIDGE_SPEED_MPS = 1.9;
 export function motorEfficiency(motor: string, resistanceN: number): number {
   const load=Math.max(0,Math.min(1,(resistanceN-40)/70));
   return motor==='motor_low'?.84-.26*load:motor==='motor_high'?.69+.15*load:.78;
@@ -61,17 +62,19 @@ export function bypassBounds(section: RouteSection): Readonly<{ startM: number; 
   if (!hasBypass(section)) return { startM: section.startM, endM: section.endM };
   return { startM: section.startM - (section.bypassLeadM ?? 3), endM: section.endM + (section.bypassExitM ?? 3) };
 }
-export function nearestJunction(sections: readonly RouteSection[], x: number, direction = 1): RouteSection | undefined {
+/** Both merge points stay selectable regardless of travel direction. Keep the
+ * window on the shared road so changing lanes cannot teleport the vehicle. */
+export function nearestJunction(sections: readonly RouteSection[], x: number): RouteSection | undefined {
+  const distance = (s: RouteSection) => {
+    const bounds = bypassBounds(s);
+    return Math.min(Math.abs(x-bounds.startM), Math.abs(x-bounds.endM));
+  };
   return sections.filter(s => {
     if (!hasBypass(s)) return false;
     const bounds = bypassBounds(s);
-    const edge = direction < 0 ? bounds.endM : bounds.startM;
-    return Math.abs(x-edge)<=2 && (direction < 0 ? x>=edge-.02 : x<=edge+.02);
-  }).sort((a,b)=>{
-    const ae=bypassBounds(a),be=bypassBounds(b);
-    const da=Math.abs(x-(direction<0?ae.endM:ae.startM)),db=Math.abs(x-(direction<0?be.endM:be.startM));
-    return da-db;
-  })[0];
+    return (x>=bounds.startM-2 && x<=bounds.startM+.02)
+      || (x>=bounds.endM-.02 && x<=bounds.endM+2);
+  }).sort((a,b)=>distance(a)-distance(b))[0];
 }
 export const ROUTE_LANE_OFFSET_M = .4;
 // The same sampled curve supplies rendered geometry, arc length and motion conversion.
@@ -147,7 +150,7 @@ export function routeDistance(def: EnvironmentDefinition, choices: EnvironmentSt
 export function routePresentation(def: EnvironmentDefinition, env: EnvironmentState, x: number, direction=env.travelDirection) {
   const boundsFor=(s:RouteSection)=>env.choices[s.id]==='bypass'?bypassBounds(s):{startM:s.startM,endM:s.endM};
   const active=def.sections.find(s=>{const b=boundsFor(s);return x>b.startM+.02&&x<b.endM-.02;});
-  const junction=nearestJunction(def.sections,x,direction);
+  const junction=nearestJunction(def.sections,x);
   const upcoming=def.sections.map(section=>{const b=bypassBounds(section);return {section,distance:direction<0?x-b.endM:b.startM-x};})
     .filter(item=>item.distance>=0&&item.distance<=Math.max(8,env.model.sensor==='sensor_lidar'?15:8)).sort((a,b)=>a.distance-b.distance)[0];
   const merged=def.sections.find(s=>{if(env.choices[s.id]!=='bypass')return false;const b=bypassBounds(s);return direction<0?x<b.startM&&x>=b.startM-2:x>b.endM&&x<=b.endM+2;});
@@ -197,7 +200,7 @@ export function simulateEnvironmentStep(def: EnvironmentDefinition, env: Environ
   }
   let limit=Math.min(m.maxSpeed, p.bypass?Math.min(m.maxSpeed*.96,Math.sqrt((leg?1.1:2.0)/Math.max(.01,Math.abs(p.curvature)))):m.maxSpeed)*Math.sqrt(Math.min(1,65/state.massKg));
   if(dir<0)limit*=.6;
-  if(section&&!p.bypass){if(section.kind==='soil')limit*=track?.9:leg?.85:.48;if(section.kind==='bridge')limit=Math.min(limit,leg?1.5:1.2)}
+  if(section&&!p.bypass){if(section.kind==='soil')limit*=track?.9:leg?.85:.48;if(section.kind==='bridge')limit=Math.min(limit,leg?QUADRUPED_BRIDGE_SPEED_MPS:1.2)}
   // Geometry sensing brakes before nearby hazards; it changes control, not friction or efficiency.
   const lookahead=m.sensor==='sensor_depth'?8:m.sensor==='sensor_lidar'?15:5;
   if(dir)for(const upcoming of def.sections){
@@ -210,7 +213,12 @@ export function simulateEnvironmentStep(def: EnvironmentDefinition, env: Environ
   const ground=environmentTerrain(def,env,terrain);
   const grade=ground.sample(state.xM).slope/p.scale;
   const resistance=state.massKg*9.81*(crr+Math.max(0,grade*dir));
-  const force=Math.min(m.forceN,mu*state.massKg*9.81,m.powerW*.78/Math.max(.8,Math.abs(state.speedMps)));
+  // On the arch, planted legs supply the uphill support independently of the
+  // drive motor. The energy ledger below still charges the full climbing work.
+  const climbingSupport=leg && section?.kind==='bridge' && !p.bypass
+    ? state.massKg*9.81*Math.max(0,grade*dir) : 0;
+  const force=Math.min(mu*state.massKg*9.81,
+    Math.min(m.forceN,m.powerW*.78/Math.max(.8,Math.abs(state.speedMps)))+climbingSupport);
   const target=env.work||intent.brake?0:dir*limit;
   const reversing=state.speedMps*dir<0;
   const accel=env.work||intent.brake||reversing?5:!dir?1:Math.max(0,Math.min(2.8,(force-resistance)/state.massKg));

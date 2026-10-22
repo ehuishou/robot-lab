@@ -1,0 +1,1 @@
+{"extends":"./tsconfig.json","compilerOptions":{"lib":["ES2020"],"types":["node"]},"include":["server","src/content/challenges.ts","src/content/modules.ts","src/domain"]}

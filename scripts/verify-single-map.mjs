@@ -12,14 +12,15 @@ const {scoreChallenge,createChallengeSnapshot}=load('src/domain/mission/scoring.
 const {saveChallengeResult,readBestScore,CHALLENGE_RECORDS_KEY}=load('src/app/ChallengeRecords.ts');
 const {sandboxMission,sandboxCatalog}=load('src/testing/SandboxPolicy.ts');
 const terrain=createTerrainSampler(mission.terrain),checks=[],runs=[];let seq=0;
-const stability=new Map();
+const stability=new Map(), peakPoses=new Map(), bridgeStability=new Map();
 const check=(name,fn)=>{fn();checks.push(name);console.log('PASS',name)};
 function create(c={},test=false){return createMissionSession('single-'+ ++seq,test?sandboxMission(mission):mission,{...mission.recommendedConfiguration,...c},test?sandboxCatalog(catalog):catalog,assets).state;}
 function command(s,c){return transitionSession(s,{sessionId:s.sessionId,commandId:'c'+ ++seq,...c});}
 function send(s,c){const r=command(s,c);assert.ok(r.accepted,JSON.stringify({command:c,reason:r.reason,x:s.xM,phase:s.phase}));return r.state;}
 function tick(s,throttle=0,brake=true){
  const next=send(s,{kind:'drive',deltaSeconds:1/30,intent:{throttle,brake}});
- if(next.quadruped)stability.set(s.sessionId,Math.max(stability.get(s.sessionId)??0,next.quadruped.tiltDegrees));
+ if(next.quadruped && next.quadruped.tiltDegrees>(stability.get(s.sessionId)??0)){stability.set(s.sessionId,next.quadruped.tiltDegrees);peakPoses.set(s.sessionId,{x:next.xM,v:next.speedMps,dir:throttle});}
+ if(next.quadruped && next.xM>=60 && next.xM<=72)bridgeStability.set(s.sessionId,Math.max(bridgeStability.get(s.sessionId)??0,next.quadruped.tiltDegrees));
  return next;
 }
 function wait(s){for(let i=0;i<400&&s.environment.work&&!s.result;i++)s=tick(s);assert.equal(s.environment.work,null);return s;}
@@ -62,6 +63,65 @@ check('sand cannot be selected as a bypass; bridge is exclusive in both directio
   assert.equal(E.constrainEnvironmentMotion(mission.environment,env,58,61),chassis==='chassis_quadruped'?61:59.2);
   assert.equal(E.constrainEnvironmentMotion(mission.environment,env,74,71),chassis==='chassis_quadruped'?71:72.8);
   assert.equal(E.constrainEnvironmentMotion(mission.environment,{...env,choices:{bridge:'bypass'}},58,61),61);
+ }
+});
+check('both junctions accept either direction after passing and reversing; branch interior is locked',()=>{
+ const section=mission.environment.sections.find(s=>s.kind==='bridge'),b=E.bypassBounds(section);
+ for(const direction of [1,-1])for(const x of [b.startM-2,b.startM,b.endM,b.endM+2]){
+  const base=create(),s={...base,xM:x,environment:{...base.environment,travelDirection:direction}};
+  assert.equal(E.routePresentation(mission.environment,s.environment,x).junction?.id,section.id);
+  for(const route of ['direct','bypass'])assert.equal(command(s,{kind:'route',sectionId:section.id,route}).accepted,true);
+ }
+ for(const x of [b.startM-2.1,b.startM+.1,66,b.endM-.1,b.endM+2.1]){
+  assert.equal(E.nearestJunction([section],x),undefined);
+  assert.equal(command({...create(),xM:x},{kind:'route',sectionId:section.id,route:'bypass'}).accepted,false);
+ }
+ let s=go(create(),58);s=go(s,54);
+ assert.equal(s.environment.travelDirection,-1);
+ assert.equal(E.routePresentation(mission.environment,s.environment,s.xM).junction?.id,section.id);
+ s=send(s,{kind:'route',sectionId:section.id,route:'bypass'});s=go(s,78);
+ assert.equal(s.environment.choices.bridge,'bypass');
+ s=go(s,76);s=go(s,78);
+ assert.equal(s.environment.travelDirection,1);
+ s=send(s,{kind:'route',sectionId:section.id,route:'direct'});
+ assert.equal(s.environment.choices.bridge,'direct');
+});
+check('pickup, charge, clear, delivery and staging remain available after reversing',()=>{
+ const {findNearbyInteraction}=load('src/domain/mission/nearbyInteraction.ts');
+ let s=go(create(),40);s=go(s,38);assert.equal(s.environment.travelDirection,-1);
+ assert.equal(findNearbyInteraction(s)?.kind,'pickup');s=send(s,{kind:'pickup',objectId:'cargo'});s=wait(s);
+ s=send(s,{kind:'stage',cargoIds:['cargo']});s=wait(s);
+ assert.equal(findNearbyInteraction(s)?.kind,'pickup');s=send(s,{kind:'pickup',objectId:'cargo'});s=wait(s);
+ s=go(s,49);s=go(s,47);assert.equal(s.environment.travelDirection,-1);
+ s=send(s,{kind:'work'});assert.equal(s.environment.work.kind,'charge');s=wait(s);
+ s=go(s,54);s=send(s,{kind:'route',sectionId:'bridge',route:'bypass'});s=go(s,84.1);
+ s=tick(s,-1,false);s=tick(s);assert.equal(s.environment.travelDirection,-1);
+ s=send(s,{kind:'work'});assert.equal(s.environment.work.kind,'clear');s=wait(s);
+ s=go(s,98);s=go(s,95);assert.equal(s.environment.travelDirection,-1);
+ assert.equal(findNearbyInteraction(s)?.kind,'deliver');s=send(s,{kind:'deliver',zoneId:'delivery',cargoIds:['cargo']});s=wait(s);
+ assert.equal(s.cargo.delivered.length,1);
+});
+const bridgeRuns=[];
+check('all quadruped motors cross the arch faster than bypass, loaded and in reverse',()=>{
+ for(const motor of ['motor_low','motor_standard','motor_high'])for(const heavy of [false,true]){
+  const config={chassis:'chassis_quadruped',motor,...(heavy?{battery:'battery_large',accessory:'tool_blade'}:{})};
+  let base=create(config);
+  if(heavy){base=go(base,38);base=send(base,{kind:'pickup',objectId:'cargo'});base=wait(base);}
+  base=go(base,54);
+  const times={};
+  for(const route of ['direct','bypass']){
+   stability.set(base.sessionId,0);bridgeStability.set(base.sessionId,0);
+   let s=send(base,{kind:'route',sectionId:'bridge',route});const start=s.elapsedSeconds,energy=s.energyConsumedUnits;
+   s=go(s,78);const forward=s.elapsedSeconds-start;
+   s=send(s,{kind:'route',sectionId:'bridge',route});const reverseStart=s.elapsedSeconds;
+   s=go(s,54);times[route]={forward,reverse:s.elapsedSeconds-reverseStart};
+   assert.ok((stability.get(s.sessionId)??0)<25,JSON.stringify({motor,heavy,route,tilt:stability.get(s.sessionId),peak:peakPoses.get(s.sessionId)}));
+   assert.ok((bridgeStability.get(s.sessionId)??0)<12,JSON.stringify({motor,heavy,route,bridgeTilt:bridgeStability.get(s.sessionId)}));
+   assert.ok(s.energyConsumedUnits>energy);assert.equal(s.quadruped.overturnedSeconds,0);
+  }
+  assert.ok(times.direct.forward<times.bypass.forward,JSON.stringify({motor,heavy,times}));
+  assert.ok(times.direct.reverse<times.bypass.reverse,JSON.stringify({motor,heavy,times}));
+  bridgeRuns.push({motor,heavy,times});
  }
 });
 check('shared arch rises and falls; bypass remains flat',()=>{
@@ -110,7 +170,7 @@ check('heavy quadruped with large battery and blade stays upright through sand a
  assert.equal(s.parameters.massKg,114);
  // A moving gait can temporarily place the COM outside its contact triangle.
  // Check actual tilt over the whole trip, including the loaded arch crossing.
- assert.ok(stability.get(s.sessionId)<12,JSON.stringify({maxTiltDegrees:stability.get(s.sessionId)}));
+ assert.ok(stability.get(s.sessionId)<12,JSON.stringify({maxTiltDegrees:stability.get(s.sessionId),peak:peakPoses.get(s.sessionId)}));
  assert.equal(s.quadruped.overturnedSeconds,0);
 });
 check('blade halves clearing time and works with a full cargo hold',()=>{
@@ -133,5 +193,5 @@ check('time and energy failures settle at zero; pause holds simulation',()=>{
  const timed=tick({...s,elapsedSeconds:180});assert.equal(timed.result.failure,'timeExceeded');assert.equal(timed.result.score.formalScore,0);
  const drained=tick({...s,energyRemainingUnits:.00001});assert.equal(drained.result.failure,'energyExhausted');assert.equal(drained.result.score.formalScore,0);
 });
-mkdirSync('docs/evidence/single-map',{recursive:true});writeFileSync('docs/evidence/single-map/domain.json',JSON.stringify({checks,runs},null,2));
+mkdirSync('docs/evidence/single-map',{recursive:true});writeFileSync('docs/evidence/single-map/domain.json',JSON.stringify({checks,bridgeRuns,runs},null,2));
 console.log(JSON.stringify(runs,null,2));

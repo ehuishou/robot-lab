@@ -169,7 +169,7 @@ function applyCommand(state: SessionState, command: SessionCommand, deferSettlem
     if (state.phase !== 'running') return reject('inactiveSession');
     if (command.kind === 'route') {
       if (!state.environment || !state.mission.environment || Math.abs(state.speedMps)>.75 || state.environment.work || !['direct','bypass'].includes(command.route)) return reject('invalidCommand');
-      const section = nearestJunction(state.mission.environment.sections.filter(s=>s.id===command.sectionId),state.xM,state.environment.travelDirection);
+      const section = nearestJunction(state.mission.environment.sections.filter(s=>s.id===command.sectionId),state.xM);
       if (!section || section.id !== command.sectionId) return reject('outOfRange');
       next = {...state,environment:{...state.environment,choices:{...state.environment.choices,[section.id]:command.route}}};
       emit('advanced');
