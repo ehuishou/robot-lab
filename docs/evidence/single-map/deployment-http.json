@@ -1,41 +1,41 @@
 {
-  "checkedAt": "2026-10-20T13:44:19.736Z",
+  "checkedAt": "2026-10-22T13:15:49.758Z",
   "base": "http://121.199.30.133:3001",
   "checks": [
     {
       "path": "/",
       "status": 200,
-      "buildId": "build-19621c47609a-20261020133734963"
+      "buildId": "build-dc3ac7b92de3-20261022124726122"
     },
     {
       "path": "/index.html",
       "status": 200,
-      "buildId": "build-19621c47609a-20261020133734963"
+      "buildId": "build-dc3ac7b92de3-20261022124726122"
     },
     {
       "path": "/preview.html",
       "status": 200,
-      "buildId": "build-19621c47609a-20261020133734963"
+      "buildId": "build-dc3ac7b92de3-20261022124726122"
     },
     {
       "path": "/?test=0",
       "status": 200,
-      "buildId": "build-19621c47609a-20261020133734963"
+      "buildId": "build-dc3ac7b92de3-20261022124726122"
     },
     {
       "path": "/?test=1",
       "status": 200,
-      "buildId": "build-19621c47609a-20261020133734963"
+      "buildId": "build-dc3ac7b92de3-20261022124726122"
     },
     {
-      "path": "/assets/previewBoot-CLy9bNfF.css",
+      "path": "/assets/previewBoot-DHl-CDXJ.js",
       "status": 200,
-      "sha256": "cb477327df92e88fdff255278c93a81581b7ed5982c969ef1b9fa59048ee5a23"
+      "sha256": "2338e01f9b130e3b87a546fb31660cca20aa3fd839d6e93c818d66b9c66c4b4f"
     },
     {
-      "path": "/assets/previewBoot-DssMn-xi.js",
+      "path": "/assets/previewBoot-ndjSvycE.css",
       "status": 200,
-      "sha256": "b7b83114b66f7a3232dae6b62e4017c23783e0cf0ca090cf0be34dca64b4a633"
+      "sha256": "325a7c87d71ae18c1af82cc84ea11f23ae405024ac5e0fc45b34b556737cd6da"
     }
   ]
 }

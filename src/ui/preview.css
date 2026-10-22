@@ -30,6 +30,8 @@ kbd{font:10px "Segoe UI",sans-serif;color:var(--muted);border:1px solid #5870847
 .driving-panel p{display:flex;justify-content:space-between;gap:12px;font-size:10px;margin-top:10px}
 @media(max-width:900px),(max-height:500px) and (max-width:1100px){
   html[data-preview-state=ready]:has(#preview-app[data-playing=true]){overflow:hidden;overscroll-behavior:none}
+  body:has(#preview-app[data-playing=true]) #test-mode-control{display:none}
+  body #preview-app[data-playing=true]{top:0}
   #preview-app[data-playing=true]{position:fixed;inset:0;max-width:none;padding:0;height:auto;background:#0d1d2b;z-index:5}
   #preview-app[data-playing=true]>.topbar,#preview-app[data-playing=true]>.page-tabs,#preview-app[data-playing=true]>.preview-footer,#preview-app[data-playing=true] .module-panel,#preview-app[data-playing=true] .inspection-panel{display:none}
   #preview-app[data-playing=true] .workbench{display:block;height:100%}
@@ -59,16 +61,19 @@ kbd{font:10px "Segoe UI",sans-serif;color:var(--muted);border:1px solid #5870847
   #preview-app[data-playing=true] .result-row{font-size:11px;padding:11px 0}
 }
 @media(max-height:500px) and (max-width:1100px){
-  #preview-app[data-playing=true] .viewport-heading{padding-top:calc(6px + env(safe-area-inset-top,0px));padding-bottom:6px}
-  #preview-app[data-playing=true] .session-toolbar{margin-top:env(safe-area-inset-top,0px)}
-  #preview-app[data-playing=true] .hud-demo{grid-template-columns:1fr 1fr 1fr 1.5fr;gap:6px}
+  #preview-app[data-playing=true] .viewport-panel{grid-template-rows:auto minmax(0,1fr) auto}
+  #preview-app[data-playing=true] .viewport-heading{display:none}
+  #preview-app[data-playing=true] .session-toolbar{position:absolute;top:0;right:0;margin:0 max(10px,env(safe-area-inset-right,0px)) 0 0}
+  #preview-app[data-playing=true] #three-viewport{grid-row:2}
+  #preview-app[data-playing=true] .hud-demo{grid-row:1;grid-template-columns:1fr 1fr 1fr 1.5fr;gap:6px;margin-right:90px}
   #preview-app[data-playing=true] .hud-demo>div:not(.control-legend){padding:5px 8px}
   #preview-app[data-playing=true] .hud-demo strong{margin-top:0}
   #preview-app[data-playing=true] .hud-demo .control-legend{grid-column:auto;align-content:center;padding:5px 8px}
   #preview-app[data-playing=true] .energy-track{display:none}
-  #preview-app[data-playing=true] .driving-panel{padding-top:8px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+  #preview-app[data-playing=true] .driving-panel{grid-row:3;padding-top:6px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))}
   #preview-app[data-playing=true] .drive-cluster{max-width:200px}
-  #preview-app[data-playing=true] .driving-buttons button{min-height:66px;padding:6px}
+  #preview-app[data-playing=true] .driving-buttons button{grid-template-columns:auto 1fr;min-height:44px;padding:6px}
+  #preview-app[data-playing=true] .drive-symbol{grid-column:auto;font-size:20px}
   #preview-app[data-playing=true] .driving-panel p{display:none}
   #preview-app[data-playing=true] .pause-overlay,#preview-app[data-playing=true] .result-demo{top:12px;max-height:calc(100% - 24px - env(safe-area-inset-bottom,0px));padding:16px}
 }
@@ -121,13 +126,25 @@ kbd{font:10px "Segoe UI",sans-serif;color:var(--muted);border:1px solid #5870847
   .route-choice small { font-size:10px; margin-left:2px; }
 }
 
+@media(max-width:900px),(max-height:500px) and (max-width:1100px){
+  #preview-app[data-playing=true] .hud-demo .control-legend{height:42px;overflow:hidden}
+}
+@media(max-height:500px) and (max-width:1100px){
+  #preview-app[data-playing=true] .hud-demo .control-legend{height:48px}
+}
+
 /* Single-map itinerary remains readable on narrow inspection panels. */
 .mission-route{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.mission-route>div{min-width:0;padding:8px;background:rgba(255,255,255,.025);border-radius:6px}.mission-route span{white-space:normal}.mission-route b{font-size:12px}
 
-/* Route selection occupies space only when a junction can be selected. */
-.environment-controls:not([data-route-state=junction]) .route-choice{display:none}
-.environment-controls:not([data-route-state=junction]){height:76px;grid-template-rows:20px 44px}
-.environment-controls:not([data-route-state=junction]) .route-tools{grid-column:1/-1;grid-row:2}
+/* Reserve route space throughout the drive so junctions never resize the scene. */
+.environment-controls .route-choice{grid-row:2}
+.environment-controls .route-tools{grid-row:3}
+.environment-controls:not([data-route-state=junction]) .route-choice{visibility:hidden}
+#preview-app .module-panel,#preview-app .module-panel button{touch-action:pan-y}
+@media(max-height:500px) and (max-width:1100px){
+  .environment-controls .route-choice,.environment-controls .route-tools{grid-row:2}
+}
+
 @media(min-width:901px) and (min-height:501px){
   #preview-app[data-playing=true] .module-panel,#preview-app[data-playing=true] .inspection-panel{display:none}
   #preview-app[data-playing=true] .workbench{grid-template-columns:minmax(0,1fr)}

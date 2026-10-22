@@ -111,6 +111,13 @@ export function createEnvironmentView(kit:ModelKit, mission:MissionDefinition): 
       kit.box(group,[.25,.008,.18],[x,terrain.sample(x).heightM+.035,(i%5-2)*.65],mat.dark,[0,i*.4,0]);
     }
     if(s.kind==='bridge') {
+      for (const [x, direction] of [[signBounds.startM, '↑'], [signBounds.endM, '↓']] as const) {
+        const y=terrain.sample(x).heightM;
+        kit.box(group,[.16,3,.16],[x,y+1.5,-3.4],mat.dark);
+        const sign=kit.label(group,direction+' 四足翻桥 / 平地旁路',4,.65,[x,y+3.3,-3.4],'#ffe0a0','#263c49');
+        sign.name='bridge-route-reminder:'+x;
+        kit.label(group,'分岔减速选路 · 旁路 +'+s.extraM+' m',3.8,.45,[x,y+2.65,-3.4]);
+      }
       for(let i=0;i<=24;i++) {
         const x=s.startM+(s.endM-s.startM)*i/24,p=routePose(def.sections,{},terrain,x);
         kit.box(group,[.035,.012,4.65],[x,p.heightM+.04,0],i%4===0?mat.orange:mat.steel,[0,0,Math.atan(p.slope)]);

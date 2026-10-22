@@ -188,7 +188,7 @@ export const MODULES: readonly CatalogModule[] = [
       "clearDebris"
     ],
     "name": "推土铲",
-    "description": "清除障碍"
+    "description": "快速推开碎料箱，清障用时减半"
   },
   {
     "id": "tool_gripper",

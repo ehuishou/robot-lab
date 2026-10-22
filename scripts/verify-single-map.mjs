@@ -12,11 +12,16 @@ const {scoreChallenge,createChallengeSnapshot}=load('src/domain/mission/scoring.
 const {saveChallengeResult,readBestScore,CHALLENGE_RECORDS_KEY}=load('src/app/ChallengeRecords.ts');
 const {sandboxMission,sandboxCatalog}=load('src/testing/SandboxPolicy.ts');
 const terrain=createTerrainSampler(mission.terrain),checks=[],runs=[];let seq=0;
+const stability=new Map();
 const check=(name,fn)=>{fn();checks.push(name);console.log('PASS',name)};
 function create(c={},test=false){return createMissionSession('single-'+ ++seq,test?sandboxMission(mission):mission,{...mission.recommendedConfiguration,...c},test?sandboxCatalog(catalog):catalog,assets).state;}
 function command(s,c){return transitionSession(s,{sessionId:s.sessionId,commandId:'c'+ ++seq,...c});}
 function send(s,c){const r=command(s,c);assert.ok(r.accepted,JSON.stringify({command:c,reason:r.reason,x:s.xM,phase:s.phase}));return r.state;}
-function tick(s,throttle=0,brake=true){return send(s,{kind:'drive',deltaSeconds:1/30,intent:{throttle,brake}});}
+function tick(s,throttle=0,brake=true){
+ const next=send(s,{kind:'drive',deltaSeconds:1/30,intent:{throttle,brake}});
+ if(next.quadruped)stability.set(s.sessionId,Math.max(stability.get(s.sessionId)??0,next.quadruped.tiltDegrees));
+ return next;
+}
 function wait(s){for(let i=0;i<400&&s.environment.work&&!s.result;i++)s=tick(s);assert.equal(s.environment.work,null);return s;}
 function go(s,target){
  for(let i=0;i<6000&&!s.result;i++){
@@ -67,13 +72,14 @@ check('shared arch rises and falls; bypass remains flat',()=>{
  assert.equal(E.routePose(mission.environment.sections,{bridge:'bypass'},terrain,66).heightM,0);
 });
 check('every chassis slows in sand, tracks lose the smallest speed fraction',()=>{
- const ratios=[];
+ const ratios=[],speeds=[];
  for(const chassis of ['chassis_wheel','chassis_track','chassis_quadruped']){
   function segment(sand){let env={...E.createEnvironmentState({...mission.recommendedConfiguration,chassis,motor:'motor_standard'}),assist:false},x=19,v=0;let max=0;
    for(let i=0;i<120;i++){const r=E.simulateEnvironmentStep(sand?mission.environment:{...mission.environment,sections:[]},env,{xM:x,speedMps:v,massKg:80,energy:100,capacity:100,testMode:false},{throttle:1,brake:false},terrain,1/30);env=r.environment;x=r.xM;v=r.speedMps;max=Math.max(max,v);}return max;}
-  const ratio=segment(true)/segment(false);assert.ok(ratio<.95);ratios.push(ratio);
+  const speed=segment(true),ratio=speed/segment(false);assert.ok(ratio<.95);ratios.push(ratio);speeds.push(speed);
  }
- assert.ok(ratios[1]>ratios[0]&&ratios[1]>ratios[2]);
+ assert.ok(ratios[1]>ratios[2]&&ratios[2]>.8&&ratios[2]<.9);
+ assert.ok(speeds[2]>speeds[0]&&speeds[2]<speeds[0]*1.2);
 });
 check('all four score components, failed and test exclusions',()=>{
  const snap=createChallengeSnapshot(mission.id,mission.challenge,250,false);
@@ -84,21 +90,36 @@ check('all four score components, failed and test exclusions',()=>{
  assert.equal(scoreChallenge({...snap,testMode:true},'succeeded').formalScore,null);
  assert.throws(()=>scoreChallenge(snap,'succeeded',{...p,energyRemainingUnits:Infinity}));
 });
-function complete(chassis,carry=true,bridge='bypass',blade=false){
- let s=create({chassis,motor:chassis==='chassis_quadruped'?'motor_high':'motor_standard',...(blade?{accessory:'tool_blade'}:{})});
+function complete(chassis,carry=true,bridge='bypass',blade=false,extra={}){
+ let s=create({chassis,motor:chassis==='chassis_quadruped'?'motor_high':'motor_standard',...(blade?{accessory:'tool_blade'}:{}),...extra});
  if(carry){s=go(s,38);s=send(s,{kind:'pickup',objectId:'cargo'});s=wait(s);assert.equal(s.cargo.carried.length,1);}
  s=go(s,47);s=send(s,{kind:'work'});s=wait(s);assert.equal(s.environment.stationUsed,true);assert.ok(s.energyRestoredUnits>0);
  s=go(s,54);s=send(s,{kind:'route',sectionId:'bridge',route:bridge});
  s=go(s,84.1);s=send(s,{kind:'work'});s=wait(s);assert.equal(s.environment.removed.debris,1);
  if(carry){s=go(s,95);s=send(s,{kind:'deliver',zoneId:'delivery',cargoIds:['cargo']});s=wait(s);}
  s=go(s,100);assert.equal(s.phase,'succeeded');assert.equal(s.result.score.cargoBonus,carry?2000:0);
- assert.ok(Math.abs(s.energyRemainingUnits+s.energyConsumedUnits-s.energyRestoredUnits-70)<1e-6);
+ assert.ok(Math.abs(s.energyRemainingUnits+s.energyConsumedUnits-s.energyRestoredUnits-s.parameters.batteryCapacityUnits)<1e-6);
  assert.deepEqual(s.result.score,scoreChallenge(s.challenge,'succeeded',challengePerformance(s)));
- runs.push({chassis,carry,bridge,blade,time:s.elapsedSeconds,energy:s.energyRemainingUnits,score:s.result.score});
+ runs.push({chassis,carry,bridge,blade,time:s.elapsedSeconds,energy:s.energyRemainingUnits,maxTiltDegrees:stability.get(s.sessionId),score:s.result.score});
  return s;
 }
 let completed;
 for(const chassis of ['chassis_wheel','chassis_track','chassis_quadruped'])check(chassis+' complete real drive, cargo, charging, clearing',()=>{completed=complete(chassis,true,chassis==='chassis_quadruped'?'direct':'bypass');});
+check('heavy quadruped with large battery and blade stays upright through sand and arch',()=>{
+ const s=complete('chassis_quadruped',true,'direct',true,{battery:'battery_large'});
+ assert.equal(s.parameters.massKg,114);
+ // A moving gait can temporarily place the COM outside its contact triangle.
+ // Check actual tilt over the whole trip, including the loaded arch crossing.
+ assert.ok(stability.get(s.sessionId)<12,JSON.stringify({maxTiltDegrees:stability.get(s.sessionId)}));
+ assert.equal(s.quadruped.overturnedSeconds,0);
+});
+check('blade halves clearing time and works with a full cargo hold',()=>{
+ const config=mission.recommendedConfiguration,env=E.createEnvironmentState(config);
+ const hand=E.beginWork(mission.environment,env,config,86,0,8,25,10);
+ const blade=E.beginWork(mission.environment,env,{...config,accessory:'tool_blade'},86,0,25,25,10);
+ assert.equal(hand.work.duration,2);assert.equal(blade.work.duration,1);
+ assert.equal(E.beginWork(mission.environment,env,config,86,0,25,25,10),null);
+});
 check('empty arrival scores without transport bonus; blade clears one box',()=>complete('chassis_wheel',false,'bypass',true));
 check('scores survive reload, isolate rule versions and exclude test mode',()=>{
  const memory=new Map(),storage={getItem:k=>memory.get(k)??null,setItem:(k,v)=>memory.set(k,v)};

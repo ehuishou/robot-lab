@@ -36,6 +36,7 @@ export interface EnvironmentState {
   readonly model: Readonly<{ joulesPerUnit: number; electronicsW: number; forceN: number; powerW: number; maxSpeed: number; widthM: number; motor: string; chassis: string; sensor: string }>;
 }
 export const ENERGY_MODEL_VERSION = 'work-loss-v2.3';
+export const QUADRUPED_SOIL_FRICTION = .6;
 export function motorEfficiency(motor: string, resistanceN: number): number {
   const load=Math.max(0,Math.min(1,(resistanceN-40)/70));
   return motor==='motor_low'?.84-.26*load:motor==='motor_high'?.69+.15*load:.78;
@@ -168,7 +169,7 @@ export function beginWork(def: EnvironmentDefinition, env: EnvironmentState, c: 
     const mass=count*debris.pieceMassKg!;
     const m=env.model;
     const units=blade?(mass*9.81*.45*1.8/.65+100)/m.joulesPerUnit:(mass*9.81*.6/.55+45)/m.joulesPerUnit;
-    return {...env,blocked:'',work:{kind:'clear',sectionId:debris.id,seconds:0,duration:blade?3+count*.3:2,units,count}};
+    return {...env,blocked:'',work:{kind:'clear',sectionId:debris.id,seconds:0,duration:blade?.8+count*.2:2,units,count}};
   }
   const station=def.sections.find(s=>s.kind==='charger'&&env.choices[s.id]!=='bypass'&&Math.abs(x-(s.startM+s.endM)/2)<.8);
   if(station&&!env.stationUsed&&batteryRoom>.01)return {...env,work:{kind:'charge',sectionId:station.id,seconds:0,duration:5,units:0,count:0}};
@@ -180,7 +181,7 @@ export function simulateEnvironmentStep(def: EnvironmentDefinition, env: Environ
   const m=env.model,p=routePose(def.sections,env.choices,terrain,state.xM), section=p.section;
   const leg=m.chassis==='chassis_quadruped',track=m.chassis==='chassis_track';
   let crr=leg?.012:track?.027:.018,mu=.7,slipRatio=0;
-  if(section&&!p.bypass&&section.kind==='soil') {crr=track?.045:leg?.075:.11;mu=track?.62:leg?.48:.32;slipRatio=track?.035:leg?.07:.22}
+  if(section&&!p.bypass&&section.kind==='soil') {crr=track?.045:leg?.04:.11;mu=track?.62:leg?QUADRUPED_SOIL_FRICTION:.32;slipRatio=track?.035:leg?.05:.22}
   if(section&&!p.bypass&&section.kind==='bridge')crr=leg?.02:track?.05:.07;
   let blocked='';
   const dir=intent.throttle;
@@ -196,7 +197,7 @@ export function simulateEnvironmentStep(def: EnvironmentDefinition, env: Environ
   }
   let limit=Math.min(m.maxSpeed, p.bypass?Math.min(m.maxSpeed*.96,Math.sqrt((leg?1.1:2.0)/Math.max(.01,Math.abs(p.curvature)))):m.maxSpeed)*Math.sqrt(Math.min(1,65/state.massKg));
   if(dir<0)limit*=.6;
-  if(section&&!p.bypass){if(section.kind==='soil')limit*=track?.8:leg?.65:.48;if(section.kind==='bridge')limit=Math.min(limit,leg?1.5:1.2)}
+  if(section&&!p.bypass){if(section.kind==='soil')limit*=track?.9:leg?.85:.48;if(section.kind==='bridge')limit=Math.min(limit,leg?1.5:1.2)}
   // Geometry sensing brakes before nearby hazards; it changes control, not friction or efficiency.
   const lookahead=m.sensor==='sensor_depth'?8:m.sensor==='sensor_lidar'?15:5;
   if(dir)for(const upcoming of def.sections){
@@ -256,7 +257,7 @@ export function reconcileContactMotion(def: EnvironmentDefinition, before: Envir
   const oldDistance=motion.environment.distanceM-before.distanceM;
   const distance=routeDistance(def,before.choices,terrain,xBefore,xAfter);
   const soil=a.section?.kind==='soil'&&!a.bypass, bridge=a.section?.kind==='bridge'&&!a.bypass;
-  const crr=soil?.075:bridge?.02:.012;
+  const crr=soil?.04:bridge?.02:.012;
   const resistance=massKg*9.81*(crr+Math.max(0,environmentTerrain(def,before,terrain).sample(xBefore).slope*Math.sign(motion.environment.commandedSpeedMps)/a.scale));
   const efficiency=motorEfficiency(m.motor,resistance);
   const predicted=routePose(def.sections,before.choices,terrain,motion.xM);

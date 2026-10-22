@@ -100,10 +100,30 @@ try {
   assert.equal(await evaluate('document.querySelector("[data-action=route-bypass]").hidden'),true);
   await go(38);await interact();assert.equal((await diagnostics()).session.cargo.carried.length,1);await shot('desktop-cargo');
   await go(47);await work();assert.equal((await diagnostics()).session.environment.stationUsed,true);await shot('desktop-charger');
-  await go(54);await click('[data-action="route-direct"]');await go(66);await shot('desktop-bridge');
+  const sizes=[[1366,900],[390,844],[844,390]];
+  async function routeBoxes(){const boxes=[];for(const [width,height] of sizes){
+    await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<1000});await delay(150);
+    boxes.push(await evaluate('(()=>{const r=document.getElementById("three-viewport").getBoundingClientRect();return {y:r.y,h:r.height}})()'));
+    assert.ok(boxes.at(-1).h>=130,JSON.stringify({width,height,scene:boxes.at(-1)}));
+  }await send('Emulation.setDeviceMetricsOverride',{width:1366,height:900,deviceScaleFactor:1,mobile:false});return boxes;}
+  await go(51);const before=await routeBoxes();
+  assert.ok((await evaluate('document.getElementById("interaction-prompt").textContent')).includes('分岔'));
+  await go(54);const during=await routeBoxes();
+  await click('[data-action="route-direct"]');await shot('desktop-junction');
+  for(const [width,height] of sizes.slice(1)){
+    await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await delay(150);
+    await shot('junction-'+width+'x'+height);
+  }
+  await send('Emulation.setDeviceMetricsOverride',{width:1366,height:900,deviceScaleFactor:1,mobile:false});
+  await go(56);const after=await routeBoxes();
+  assert.deepEqual(during,before);assert.deepEqual(after,before);report.routeBounds={before,during,after};
+  pass('route junction and direct choice preserve scene bounds on desktop, portrait and landscape');
+  await go(66);await shot('desktop-bridge');
   assert.ok((await diagnostics()).session.heightM>.7);await go(78);await shot('desktop-bridge-exit');
   await go(84.15);await shot('desktop-large-box');await work();assert.equal((await diagnostics()).session.environment.removed.debris,1);await shot('desktop-cleared-box');
   await go(95);await interact();assert.equal((await diagnostics()).session.cargo.delivered.length,1);
+  assert.ok((await evaluate('document.getElementById("interaction-prompt").textContent')).includes('终点'));
+  await shot('desktop-finish-approach');
   await go(100);await shot('desktop-result');
   const s=(await diagnostics()).session;assert.equal(s.result.score.cargoBonus,2000);assert.ok(s.result.score.formalScore>2000);
   assert.equal(await evaluate('document.querySelectorAll("#challenge-result .result-row").length'),6);
@@ -120,6 +140,16 @@ try {
   await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
   await send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:5});
   await preview(report.base+'/');await click('[data-action="recommended"]');await shot('mobile-configuration');
+  async function swipe(selector){
+    const start=await evaluate('(()=>{const e=document.querySelector('+JSON.stringify(selector)+');e.scrollIntoView({block:"center"});const r=e.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2,scroll:scrollY,module:document.querySelector(".module-card[aria-pressed=true]")?.dataset.module,category:document.querySelector("[data-category][aria-pressed=true]")?.dataset.category}})()');
+    await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:start.x,y:start.y,id:2,radiusX:6,radiusY:6}]});
+    for(let step=1;step<=8;step++){await send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:start.x,y:start.y-step*18,id:2,radiusX:6,radiusY:6}]});await delay(25);}
+    await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await delay(350);
+    const end=await evaluate('({scroll:scrollY,module:document.querySelector(".module-card[aria-pressed=true]")?.dataset.module,category:document.querySelector("[data-category][aria-pressed=true]")?.dataset.category})');
+    assert.ok(end.scroll>start.scroll+30,JSON.stringify({selector,start,end}));assert.equal(end.module,start.module);assert.equal(end.category,start.category);
+  }
+  await swipe('[data-category="chassis"]');await swipe('[data-module="chassis_wheel"]');
+  pass('native vertical swipes over category and component buttons scroll without selecting');
   assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth+1'),true);
   await click('[data-action="start"]');
   const box=await evaluate('(()=>{const r=document.querySelector("[data-drive=forward]").getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}})()');

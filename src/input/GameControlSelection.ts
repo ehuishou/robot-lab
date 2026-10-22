@@ -28,9 +28,10 @@ export class GameControlSelection {
   };
   private clearOnControl = (event: PointerEvent): void => { if (this.inControls(event.target)) this.clearSelection(); };
   private touchStart = (event: TouchEvent): void => {
-    if (!this.inControls(event.target)) return;
+    if (!this.inControls(event.target) || !event.target.closest('.driving-panel,.session-toolbar')) return;
     // WebKit can create selection handles without firing selectstart. Stop the
-    // initiating touch default, then dispatch one ordinary tap for non-drive controls.
+    // initiating touch default only inside driving controls. Assembly buttons keep
+    // native taps and vertical scrolling. Dispatch ordinary taps for other drive-panel actions.
     if (event.cancelable) event.preventDefault();
     this.clearSelection();
     const target = event.target.closest<HTMLElement>('button,summary');

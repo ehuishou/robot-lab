@@ -1,6 +1,6 @@
 import type { MissionDefinition } from '../domain/mission/definition';
 
-export const CHALLENGE_RULES_VERSION = 'single-map-v1';
+export const CHALLENGE_RULES_VERSION = 'single-map-v2';
 /** The only playable map. Geometry, HUD, validation and scoring consume this definition. */
 export const TRANSPORT_MISSION: MissionDefinition = {
   id: 'transport-yard', name: '沙地运输场',
@@ -26,7 +26,7 @@ export const TRANSPORT_MISSION: MissionDefinition = {
     { id: 'finish', kind: 'reach', xM: 100 },
   ],
   hardLimits: { maxTimeSeconds: 180 },
-  configurationRules: {"baseMassKg":20,"requiredPayloadLimits":["tool"],"requiredCapabilities":["carryLight"],"minPayloadKg":8,"maxMassKg":90,"maxCost":500,"maxBatteryCapacityUnits":100},
+  configurationRules: {"baseMassKg":20,"requiredPayloadLimits":["tool"],"requiredCapabilities":["carryLight"],"minPayloadKg":8,"maxMassKg":120,"maxCost":500,"maxBatteryCapacityUnits":100},
   recommendedConfiguration: {"chassis":"chassis_wheel","motor":"motor_low","battery":"battery_standard","sensor":"sensor_camera","tool":"tool_arm"},
 };
 

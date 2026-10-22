@@ -1,5 +1,5 @@
 import { GameControlSelection } from '../input/GameControlSelection';
-import { beginWork, senseEnvironment, routePresentation, hasBypass } from '../domain/simulation/environment';
+import { beginWork, senseEnvironment, routePresentation, hasBypass, bypassBounds } from '../domain/simulation/environment';
 import { TRANSPORT_MISSION } from '../content/challenges';
 import { SCORE_WEIGHTS } from '../domain/mission/scoring';
 import { readBestScore, saveChallengeResult } from './ChallengeRecords';
@@ -262,7 +262,7 @@ export class VisualPreviewApp {
       directButton.hidden=!junction;
       for(const action of ['route-direct','route-bypass']) {const b=this.root.querySelector<HTMLButtonElement>('[data-action="'+action+'"]')!;b.dataset.sectionId=junction?.id??'';b.disabled=state.phase!=='running'||!!work||!junction||Math.abs(state.speedMps)>.75;b.setAttribute('aria-pressed',String(!!presentation.section&&presentation.choice===(action==='route-direct'?'direct':'bypass')))}
       const ready=beginWork(state.mission.environment,env,state.configuration,state.xM,state.speedMps,state.cargo.carried.reduce((a,c)=>a+c.massKg,0),state.parameters.payloadKg,state.parameters.batteryCapacityUnits-state.energyRemainingUnits);
-      const workButton=this.root.querySelector<HTMLButtonElement>('[data-action="work"]')!;workButton.disabled=state.phase!=='running'||!ready;workButton.textContent=ready?.work?.kind==='charge'?'充电 5s':ready?.work?.kind==='clear'?'清理碎料':'作业 / 充电';
+      const workButton=this.root.querySelector<HTMLButtonElement>('[data-action="work"]')!;workButton.disabled=state.phase!=='running'||!ready;workButton.textContent=ready?.work?.kind==='charge'?'充电 5s':ready?.work?.kind==='clear'?'清障 '+ready.work.duration.toFixed(0)+'s':'作业 / 充电';
       const stage=this.root.querySelector<HTMLButtonElement>('[data-action="stage"]')!;stage.disabled=state.phase!=='running'||!!work||!state.cargo.carried.length||Math.abs(state.speedMps)>.25||Math.abs(env.zM)>.5||!state.mission.platforms.some(p=>state.xM>=p.startM&&state.xM<=p.endM);
       const assist=this.root.querySelector<HTMLButtonElement>('[data-action="assist"]')!;assist.textContent='辅助：'+(env.assist?'开':'关');assist.disabled=state.phase!=='running';
     }
@@ -289,8 +289,13 @@ export class VisualPreviewApp {
     const interactionCargo = interaction?.kind === 'pickup' ? targets.find(item=>item.id===interaction.objectId) : undefined;
     const canLoadNext = nextCargo && carriedKg + nextCargo.cargo.massKg <= state.cargo.capacityKg;
     if (!delivered && state.cargo.carried.length && canLoadNext) this.element('hud-objective').textContent = '已交 '+deliveredCount+'/'+targets.length+' · 前往 '+nextCargo.xM+' m装载';
+    const bridge = state.mission.environment?.sections.find(s=>s.kind==='bridge');
+    const bridgeBounds = bridge ? bypassBounds(bridge) : null;
+    const approachingBridge = bridgeBounds && state.xM>=bridgeBounds.startM-8 && state.xM<=bridgeBounds.startM;
+    const routeHint = approachingBridge ? (state.configuration.chassis==='chassis_quadruped' ? '前方分岔：四足可直行翻桥，或选平地旁路' : '前方分岔：请减速选择平地旁路，拱桥仅限四足') : null;
+    const finishHint = state.xM>=this.mission.layout.find(item=>item.kind==='deliveryZone')!.startM ? '终点 '+this.finishObjective.xM+' m · 继续前进，驶过终点结算' : null;
     const prompt = interaction?.kind === 'deliver' ? 'E / 交互：卸货到交付平台' : interaction?.kind === 'pickup' ? `E / 交互：装载 ${interactionCargo?.cargo.massKg ?? ''} kg 货箱`
-      : state.phase === 'paused' ? '任务已暂停' : 'Space 刹车 · E 交互';
+      : state.phase === 'paused' ? '任务已暂停' : routeHint ?? finishHint ?? 'Space 刹车 · E 交互';
     if (this.element('interaction-prompt').textContent !== prompt) this.element('interaction-prompt').textContent = prompt;
     for (const button of this.root.querySelectorAll<HTMLButtonElement>('[data-drive],[data-action="pause"]')) button.disabled = state.phase !== 'running';
     if (!state.result) return;
@@ -352,7 +357,7 @@ export class VisualPreviewApp {
 
     (this.element('start-session') as HTMLButtonElement).disabled = !validation.valid || !!this.controller;
     this.element('start-session').textContent = this.controller ? '驾驶中' : '开始驾驶 →';
-    this.element('metrics').innerHTML = [['总质量', summary?.massKg, 'kg'], ...(!challenge ? [['预算', summary?.cost, TEST_MODE ? '无限额' : `/ ${rules.maxCost ?? '不限'}`]] : []), ['能源容量', summary?.batteryCapacityUnits, '单位'], ['有效载重', TEST_MODE ? '不限' : summary?.payloadKg, TEST_MODE ? '' : 'kg']].map(([name, value, unit]) => `<div><span>${name}</span><strong>${value ?? '—'} <small>${unit}</small></strong></div>`).join('');
+    this.element('metrics').innerHTML = [['总质量', summary?.massKg, TEST_MODE ? 'kg' : `/ ${rules.maxMassKg} kg`], ...(!challenge ? [['预算', summary?.cost, TEST_MODE ? '无限额' : `/ ${rules.maxCost ?? '不限'}`]] : []), ['能源容量', summary?.batteryCapacityUnits, '单位'], ['有效载重', TEST_MODE ? '不限' : summary?.payloadKg, TEST_MODE ? '' : 'kg']].map(([name, value, unit]) => `<div><span>${name}</span><strong>${value ?? '—'} <small>${unit}</small></strong></div>`).join('');
     this.element('validation').className = validation.valid ? 'validation valid' : 'validation invalid';
     this.element('validation').innerHTML = validation.valid ? (TEST_MODE ? '<strong>可出发</strong>' : '<strong>可出发</strong>') : `<strong>配置需要调整</strong>${validation.issues.map(issue => `<span>${issue.message}</span>`).join('')}`;
     this.element('selected-summary').innerHTML = MODULE_CATEGORIES.map(category => `<span><small>${CATEGORY_NAMES[category]}</small>${DISPLAY_MODULES.find(module => module.id === this.configuration[category])?.name ?? (category === 'accessory' ? '无' : '未装配')}</span>`).join('');

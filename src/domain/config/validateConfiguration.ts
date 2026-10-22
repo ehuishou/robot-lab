@@ -125,7 +125,7 @@ export function validateConfiguration(
     issues.push({ code: 'insufficientPayload', message: '有效载重不足。', actual: summary.payloadKg, limit: rules.minPayloadKg });
   }
   const constraints = [
-    ['massExceeded', '机器人重量超限。', summary.massKg, rules.maxMassKg],
+    ['massExceeded', `总质量 ${summary.massKg} kg 超过 ${rules.maxMassKg} kg 上限。`, summary.massKg, rules.maxMassKg],
     ['costExceeded', '配置成本超限。', summary.cost, rules.maxCost],
     ['batteryCapacityExceeded', '电池容量超限。', summary.batteryCapacityUnits, rules.maxBatteryCapacityUnits],
   ] as const;

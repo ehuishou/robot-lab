@@ -1,6 +1,6 @@
-﻿# 部署单地图版本
+# 部署单地图版本
 
-当前本地规则为 single-map-v1。根地址、index.html 和 preview.html 都打开同一游戏，默认正式模式；?test=1开启独立测试模式。当前实际线上构建及回滚目标见 DEPLOYED.md。
+当前本地规则为 single-map-v2。根地址、index.html 和 preview.html 都打开同一游戏，默认正式模式；?test=1开启独立测试模式。当前实际线上构建及回滚目标见 DEPLOYED.md。
 
 ## 构建与验收
 

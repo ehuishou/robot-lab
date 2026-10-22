@@ -1,4 +1,4 @@
-import { createEnvironmentState, simulateEnvironmentStep, reconcileContactMotion, constrainEnvironmentMotion, routePose, environmentTerrain, ROUTE_LANE_OFFSET_M, routeProjection, beginWork, nearestJunction } from '../simulation/environment';
+import { createEnvironmentState, simulateEnvironmentStep, reconcileContactMotion, constrainEnvironmentMotion, routePose, environmentTerrain, ROUTE_LANE_OFFSET_M, routeProjection, beginWork, nearestJunction, QUADRUPED_SOIL_FRICTION } from '../simulation/environment';
 import type { EnvironmentState, EnvironmentMotion } from '../simulation/environment';
 import { createChallengeSnapshot, scoreChallenge } from './scoring';
 import type { ChallengeSnapshot, ChallengeScore } from './scoring';
@@ -241,7 +241,7 @@ function applyCommand(state: SessionState, command: SessionCommand, deferSettlem
         }} : undefined;
         let quadruped = stepQuadruped(loaded, activeTerrain,
           next.environment&&next.mission.environment ? motion.speedMps*Math.hypot(1,path!.sample(next.xM).dz)/routePose(next.mission.environment.sections,next.environment.choices,terrain,next.xM).scale : motion.speedMps,
-          command.deltaSeconds, next.environment && next.mission.environment ? (routePose(next.mission.environment.sections,next.environment.choices,terrain,next.xM).section?.kind==='soil' && next.environment.choices[routePose(next.mission.environment.sections,next.environment.choices,terrain,next.xM).section!.id]!=='bypass' ? .48 : .75) : undefined,
+          command.deltaSeconds, next.environment && next.mission.environment ? (routePose(next.mission.environment.sections,next.environment.choices,terrain,next.xM).section?.kind==='soil' && next.environment.choices[routePose(next.mission.environment.sections,next.environment.choices,terrain,next.xM).section!.id]!=='bypass' ? QUADRUPED_SOIL_FRICTION : .75) : undefined,
           next.environment ? 0 : (motion.speedMps - next.speedMps) / command.deltaSeconds,path);
         let actualX = Math.max(0, Math.min(lengthM, path?.project(bodyOrigin(quadruped)[0],bodyOrigin(quadruped)[2])??bodyOrigin(quadruped)[0]));
         if(environmentMotion && environmentBefore && next.mission.environment){

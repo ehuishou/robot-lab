@@ -9,6 +9,8 @@
     "chassis_wheel complete real drive, cargo, charging, clearing",
     "chassis_track complete real drive, cargo, charging, clearing",
     "chassis_quadruped complete real drive, cargo, charging, clearing",
+    "heavy quadruped with large battery and blade stays upright through sand and arch",
+    "blade halves clearing time and works with a full cargo hold",
     "empty arrival scores without transport bonus; blade clears one box",
     "scores survive reload, isolate rule versions and exclude test mode",
     "time and energy failures settle at zero; pause holds simulation"
@@ -34,12 +36,12 @@
       "carry": true,
       "bridge": "bypass",
       "blade": false,
-      "time": 49.599999999999746,
-      "energy": 42.605993077038455,
+      "time": 49.06666666666644,
+      "energy": 43.25725444775968,
       "score": {
-        "formalScore": 3692,
-        "timeBonus": 724,
-        "energyBonus": 608,
+        "formalScore": 3704,
+        "timeBonus": 727,
+        "energyBonus": 617,
         "cargoBonus": 2000,
         "budgetBonus": 360
       }
@@ -49,14 +51,31 @@
       "carry": true,
       "bridge": "direct",
       "blade": false,
-      "time": 60.933333333332435,
-      "energy": 45.460693513596816,
+      "time": 59.299999999999194,
+      "energy": 47.70062851610342,
+      "maxTiltDegrees": 17.91776091509519,
       "score": {
-        "formalScore": 3490,
-        "timeBonus": 661,
-        "energyBonus": 649,
+        "formalScore": 3531,
+        "timeBonus": 670,
+        "energyBonus": 681,
         "cargoBonus": 2000,
         "budgetBonus": 180
+      }
+    },
+    {
+      "chassis": "chassis_quadruped",
+      "carry": true,
+      "bridge": "direct",
+      "blade": true,
+      "time": 61.96666666666571,
+      "energy": 73.86550482625267,
+      "maxTiltDegrees": 10.195586221966677,
+      "score": {
+        "formalScore": 3413,
+        "timeBonus": 655,
+        "energyBonus": 738,
+        "cargoBonus": 2000,
+        "budgetBonus": 20
       }
     },
     {
@@ -64,12 +83,12 @@
       "carry": false,
       "bridge": "bypass",
       "blade": true,
-      "time": 40.800000000000246,
-      "energy": 37.17538612418757,
+      "time": 38.50000000000038,
+      "energy": 37.24898612418743,
       "score": {
-        "formalScore": 1644,
-        "timeBonus": 773,
-        "energyBonus": 531,
+        "formalScore": 1658,
+        "timeBonus": 786,
+        "energyBonus": 532,
         "cargoBonus": 0,
         "budgetBonus": 340
       }

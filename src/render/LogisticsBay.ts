@@ -160,5 +160,19 @@ export function createLogisticsBay(kit: ModelKit, mission: MissionDefinition): T
       world.add(crate);
     }
   }
+  const finish=mission.objectives.find(objective=>objective.kind==='reach');
+  if(finish) {
+    const gate=new THREE.Group();gate.name='finish-marker';
+    gate.position.set(finish.xM,terrain.sample(finish.xM).heightM,0);world.add(gate);
+    for(const side of [-1,1]) {
+      kit.box(gate,[.18,3.8,.18],[0,1.9,side*2.7],steel);
+      kit.box(gate,[.2,2.9,.2],[0,1.8,side*2.7],cyan);
+    }
+    kit.box(gate,[.18,.18,5.6],[0,3.8,0],dark);
+    kit.label(gate,'终点 / '+finish.xM+' m',3.2,.7,[0,4.4,0],'#9cfff0','#263c49');
+    kit.label(gate,'继续前进 · 驶过结算',3,.45,[0,3.5,0]);
+    for(let row=0;row<2;row++)for(let col=0;col<10;col++)
+      kit.box(gate,[.24,.012,.45],[(row-.5)*.24,.065,(col-4.5)*.45],(row+col)%2?dark:cyan);
+  }
   return world;
 }
