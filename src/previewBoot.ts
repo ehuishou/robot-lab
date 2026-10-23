@@ -1,6 +1,4 @@
-﻿import { installTestModeControl } from './testing/TestMode';
-installTestModeControl();
-import './ui/preview.css';
+﻿import './ui/preview.css';
 import { VisualPreviewApp } from './app/VisualPreviewApp';
 
 declare global {

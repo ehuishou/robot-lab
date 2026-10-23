@@ -1,3 +1,4 @@
+import { MapTutorial } from './MapTutorial';
 import { NicknameScores } from './NicknameScores';
 import { GameControlSelection } from '../input/GameControlSelection';
 import { beginWork, senseEnvironment, routePresentation, hasBypass, bypassBounds } from '../domain/simulation/environment';
@@ -33,6 +34,7 @@ export class VisualPreviewApp {
   private recordMessage = '';
   private runNickname = '';
   private readonly nicknameScores: NicknameScores;
+  private readonly tutorial: MapTutorial;
   private readonly renderer: PreviewRenderer;
   private readonly abort = new AbortController();
   private controller: DrivingSessionController | null = null;
@@ -50,7 +52,7 @@ export class VisualPreviewApp {
       if (saved.status === 'rejected') storageMessage = `未载入草稿：${saved.reason}`;
     } catch { storageMessage = '浏览器存储不可用，仍可开始任务。'; }
     root.innerHTML = `
-      <header class="topbar"><a class="brand" href="./preview.html"><span class="brand-mark">RL</span><span>ROBOT LAB</span></a><button id="nickname-button" type="button"></button></header>
+      <header class="topbar"><a class="brand" href="./preview.html"><span class="brand-mark">RL</span><span>ROBOT LAB</span></a><div class="player-actions"><button id="tutorial-button" type="button">地图教学</button><button id="nickname-button" type="button"></button></div></header>
       <nav class="page-tabs" aria-label="任务页面"><button data-page="configuration">组装</button><button data-page="world">驾驶</button><button data-page="result" disabled>结算</button><span id="mission-mode"></span></nav>
       <main class="workbench">
         <aside class="module-panel panel"><div class="panel-heading"><h1>选择组件</h1></div><div class="category-tabs" role="group" aria-label="模块类别">${MODULE_CATEGORIES.map(category => `<button data-category="${category}">${CATEGORY_NAMES[category]}</button>`).join('')}</div><div id="module-cards"></div><div class="storage-actions"><button data-action="recommended">推荐配置</button><button data-action="save">保存配置</button></div><p id="storage-message" class="muted" role="status"></p></aside>
@@ -73,7 +75,10 @@ export class VisualPreviewApp {
     root.addEventListener('click', event => this.handleClick(event), { signal: this.abort.signal });
     this.controlSelection = new GameControlSelection(root);
     this.nicknameScores = new NicknameScores(root);
-    root.addEventListener('nicknamechange',()=>this.refresh(),{signal:this.abort.signal});
+    this.tutorial = new MapTutorial(root);
+    root.addEventListener('nicknamechange',()=>{this.refresh();this.tutorial.openIfNeeded();},{signal:this.abort.signal});
+    this.element('tutorial-button').addEventListener('click',()=>{if (!this.nicknameScores.nickname) this.nicknameScores.open(); else this.tutorial.open();},{signal:this.abort.signal});
+    if (this.nicknameScores.nickname) this.tutorial.openIfNeeded();
     this.refresh();
   }
 
@@ -93,6 +98,7 @@ export class VisualPreviewApp {
     if (this.disposed) return;
     this.disposed = true;
     this.abort.abort();
+    this.tutorial.dispose();
     this.nicknameScores.dispose();
     this.controlSelection.dispose();
     this.endSession();
@@ -250,6 +256,7 @@ export class VisualPreviewApp {
 
   private refreshSession(): void {
     this.nicknameScores.update(this.controller?.state.phase==='running' || this.controller?.state.phase==='paused');
+    this.root.querySelector<HTMLButtonElement>('#tutorial-button')!.disabled=!!this.controller;
     const state = this.controller?.state;
     this.element('hud-demo').hidden = !state || this.page !== 'world';
     this.element('driving-panel').hidden = !state || this.page !== 'world' || !!state.result;

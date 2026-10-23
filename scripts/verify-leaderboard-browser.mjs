@@ -38,7 +38,7 @@ async function preview(url) {
     assert.notEqual(state, 'error', await evaluate('document.getElementById("preview-error")?.textContent'));
     return state === 'ready';
   });
-  await evaluate(`(()=>{if(document.querySelector('.nickname-dialog')?.open){document.querySelector('#nickname-input').value='QA-browser';document.querySelector('#nickname-form').requestSubmit();}return true})()`);
+  await evaluate(`(()=>{if(document.querySelector('.nickname-dialog')?.open){document.querySelector('#nickname-input').value='QA-browser';document.querySelector('#nickname-form').requestSubmit();}for(let i=0;i<7&&document.querySelector('#map-tutorial')?.open;i++)document.querySelector('#tutorial-next').click();return true})()`);
 }
 async function screenshot(name) {
   const shot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
@@ -73,6 +73,7 @@ try {
  assert.equal(await evaluate("document.querySelector('.nickname-dialog').open"),true);await screenshot('nickname-desktop');
  await evaluate("document.querySelector('#nickname-input').value='  QA   Player  ';document.querySelector('#nickname-form').requestSubmit()");
  assert.equal(await evaluate("localStorage.getItem('robot_lab_nickname_v1')"),'QA Player');
+ await evaluate("for(let i=0;i<7&&document.querySelector('#map-tutorial')?.open;i++)document.querySelector('#tutorial-next').click()");
  assert.equal(await evaluate("[...document.querySelectorAll('a')].some(a=>/leaderboard/i.test(a.href)) || document.body.innerText.includes('\u6392\u884c')"),false);pass('nickname-only entry; game has no leaderboard entrance');
  await click('#nickname-button');assert.equal(await evaluate("document.querySelector('.nickname-dialog').open"),true);await evaluate("document.querySelector('#nickname-input').value='QA Other';document.querySelector('#nickname-form').requestSubmit()");
  assert.equal(await evaluate("localStorage.getItem('robot_lab_nickname_v1')"),'QA Other');pass('nickname can be changed before a run');

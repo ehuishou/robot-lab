@@ -2,7 +2,7 @@
 
 规则 `single-map-v3`。游戏根地址、`index.html`、`preview.html` 使用同一地图；`leaderboard.html` 为独立榜单，游戏无入口。实际构建及回滚见 `DEPLOYED.md`。
 
-先运行 README/TESTING 列出的构建与全部验证。发布前用安全随机值生成至少16字符管理密码，保存于忽略的 `deploy/.leaderboard-admin-password.txt`。首次部署会安装至服务器私有目录；后续发布保留既有密码，不重新生成覆盖。
+先运行 README/TESTING 列出的构建与全部验证。发布前验收登录后的图文教学及网址限定测试模式。发布前用安全随机值生成至少16字符管理密码，保存于忽略的 `deploy/.leaderboard-admin-password.txt`。首次部署会安装至服务器私有目录；后续发布保留既有密码，不重新生成覆盖。
 
 上传已验证的 `dist/`、`dist-server/`、`deploy/update.sh`、`deploy/nginx.conf`，首次新增API时还需安全传输密码文件，放入独立临时上传目录。从该目录运行 `bash deploy/update.sh`。`install.sh` 只负责首次安装入口，内部共用更新脚本。
 

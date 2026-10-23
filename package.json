@@ -11,7 +11,8 @@
     "test:browser": "node scripts/verify-single-map-browser.mjs",
     "start:api": "node dist-server/server.mjs",
     "test:leaderboard": "node scripts/verify-leaderboard.mjs",
-    "test:leaderboard:browser": "node scripts/verify-leaderboard-browser.mjs"
+    "test:leaderboard:browser": "node scripts/verify-leaderboard-browser.mjs",
+    "test:tutorial": "node scripts/verify-tutorial-browser.mjs"
   },
   "dependencies": {
     "three": "0.180.0"
