@@ -1,5 +1,6 @@
 {
   "cases": [
+    "footer GitHub icon opens the public repository through mouse and touch on desktop and mobile",
     "single map at root, normal by default, no difficulty picker",
     "legacy sample query cannot open another map",
     "one interaction button handles touch charging and replaces old operation buttons",
@@ -14,8 +15,70 @@
     "test mode shares same map"
   ],
   "exceptions": [],
-  "base": "http://127.0.0.1:65449",
-  "buildId": "build-ea726479bce3-20261023075353892",
+  "base": "http://127.0.0.1:55959",
+  "buildId": "build-4d0b7cd57705-20261023082140021",
+  "repositoryLinks": [
+    {
+      "width": 1366,
+      "height": 900,
+      "href": "https://github.com/ehuishou/robot-lab",
+      "target": "_blank",
+      "rel": "noopener noreferrer",
+      "label": "在新标签页打开 GitHub 仓库",
+      "icon": true,
+      "x": 24,
+      "y": 828.1875,
+      "w": 90.9375,
+      "h": 44,
+      "visible": true,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "href": "https://github.com/ehuishou/robot-lab",
+      "target": "_blank",
+      "rel": "noopener noreferrer",
+      "label": "在新标签页打开 GitHub 仓库",
+      "icon": true,
+      "x": 10,
+      "y": 724.375,
+      "w": 90.9375,
+      "h": 44,
+      "visible": true,
+      "overflow": false
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "href": "https://github.com/ehuishou/robot-lab",
+      "target": "_blank",
+      "rel": "noopener noreferrer",
+      "label": "在新标签页打开 GitHub 仓库",
+      "icon": true,
+      "x": 16,
+      "y": 317.5625,
+      "w": 90.9375,
+      "h": 44,
+      "visible": true,
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "height": 568,
+      "href": "https://github.com/ehuishou/robot-lab",
+      "target": "_blank",
+      "rel": "noopener noreferrer",
+      "label": "在新标签页打开 GitHub 仓库",
+      "icon": true,
+      "x": 10,
+      "y": 448.375,
+      "w": 90.9375,
+      "h": 44,
+      "visible": true,
+      "overflow": false
+    }
+  ],
   "routeBounds": {
     "before": [
       {
@@ -61,14 +124,14 @@
     ]
   },
   "run": {
-    "time": 102.24999999999548,
-    "energy": 39.427121164929915,
+    "time": 94.01666666666262,
+    "energy": 40.784570018535554,
     "result": {
       "outcome": "succeeded",
       "score": {
-        "formalScore": 3304,
-        "timeBonus": 431,
-        "energyBonus": 563,
+        "formalScore": 3369,
+        "timeBonus": 477,
+        "energyBonus": 582,
         "cargoBonus": 2000,
         "budgetBonus": 310
       }

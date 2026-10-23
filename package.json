@@ -12,7 +12,8 @@
     "start:api": "node dist-server/server.mjs",
     "test:leaderboard": "node scripts/verify-leaderboard.mjs",
     "test:leaderboard:browser": "node scripts/verify-leaderboard-browser.mjs",
-    "test:tutorial": "node scripts/verify-tutorial-browser.mjs"
+    "test:tutorial": "node scripts/verify-tutorial-browser.mjs",
+    "test:render": "node scripts/verify-route-markers.mjs"
   },
   "dependencies": {
     "three": "0.180.0"

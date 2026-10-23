@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "section": "sand",
+      "route": "direct",
+      "arrows": 7
+    },
+    {
+      "section": "charger",
+      "route": "direct",
+      "arrows": 7
+    },
+    {
+      "section": "bridge",
+      "route": "direct",
+      "arrows": 7
+    },
+    {
+      "section": "bridge",
+      "route": "bypass",
+      "arrows": 7
+    },
+    {
+      "section": "debris",
+      "route": "direct",
+      "arrows": 7
+    }
+  ]
+}

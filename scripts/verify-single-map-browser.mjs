@@ -9,6 +9,7 @@ const evidence = resolve('docs/evidence/single-map', process.argv.some(arg => ar
 mkdirSync(evidence, { recursive: true });
 let browser, socket, server, seq = 0;
 const pending = new Map();
+const openedWindows = [];
 const qaNickname = process.env.ROBOT_QA_NICKNAME ?? 'QA-browser';
 const report = { cases: [], exceptions: [], base: '' };
 async function until(fn, timeout = 45000) {
@@ -70,7 +71,8 @@ try {
     if (message.id && pending.has(message.id)) {
       const waiter = pending.get(message.id); pending.delete(message.id); clearTimeout(waiter.timer);
       if (message.error) waiter.reject(new Error(JSON.stringify(message.error))); else waiter.done(message.result);
-    } else if (message.method === 'Runtime.exceptionThrown') report.exceptions.push(message.params.exceptionDetails);
+    } else if (message.method === 'Page.windowOpen') openedWindows.push(message.params);
+    else if (message.method === 'Runtime.exceptionThrown') report.exceptions.push(message.params.exceptionDetails);
   });
   await send('Page.enable'); await send('Runtime.enable');
   await send('Emulation.setDeviceMetricsOverride', { width: 1366, height: 900, deviceScaleFactor: 1, mobile: false });
@@ -102,6 +104,28 @@ try {
   assert.equal((await diagnostics()).missionId,'transport-yard');assert.equal((await diagnostics()).testMode,false);
   assert.equal(await evaluate('document.querySelectorAll("[data-mission]").length'),0);
   assert.equal(await evaluate('document.body.innerText.includes("\u96be\u5ea6\u9009\u62e9")'),false);
+  report.repositoryLinks=[];
+  for(const [width,height] of [[1366,900],[390,844],[844,390],[320,568]]){
+    const mobile=width<1000;
+    await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile});
+    await send('Emulation.setTouchEmulationEnabled',{enabled:mobile,maxTouchPoints:5});
+    await evaluate('document.querySelector(".github-link").scrollIntoView({block:"center"})');await delay(200);
+    const link=await evaluate('(()=>{const a=document.querySelector(".preview-footer .github-link"),r=a.getBoundingClientRect();return {href:a.href,target:a.target,rel:a.rel,label:a.getAttribute("aria-label"),icon:!!a.querySelector("svg"),x:r.x,y:r.y,w:r.width,h:r.height,visible:a.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)),overflow:document.documentElement.scrollWidth>innerWidth+1}})()');
+    assert.equal(link.href,'https://github.com/ehuishou/robot-lab');assert.equal(link.target,'_blank');
+    assert.match(link.rel,/noopener/);assert.match(link.rel,/noreferrer/);assert.ok(link.icon&&link.label&&link.visible);
+    assert.ok(link.w>=44&&link.h>=44&&link.x>=0&&link.y>=0&&link.y+link.h<=height&&!link.overflow,JSON.stringify(link));
+    const opened=openedWindows.length,point={x:link.x+link.w/2,y:link.y+link.h/2};
+    if(mobile){await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point]});await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}
+    else {await send('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});await send('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});}
+    await until(()=>openedWindows.length>opened);assert.equal(openedWindows.at(-1).url,link.href);
+    const {targetInfos}=await send('Target.getTargets');
+    for(const target of targetInfos.filter(target=>target.type==='page'&&target.url.startsWith('https://github.com/')))await send('Target.closeTarget',{targetId:target.targetId});
+    await send('Page.bringToFront');await screenshot('github-footer-'+width+'x'+height);
+    report.repositoryLinks.push({width,height,...link});
+  }
+  pass('footer GitHub icon opens the public repository through mouse and touch on desktop and mobile');
+  await send('Emulation.setDeviceMetricsOverride',{width:1366,height:900,deviceScaleFactor:1,mobile:false});
+  await send('Emulation.setTouchEmulationEnabled',{enabled:false});await evaluate('scrollTo(0,0)');await delay(200);
   await shot('desktop-configuration');pass('single map at root, normal by default, no difficulty picker');
   await preview(report.base+'/preview.html?sample=1');assert.equal((await diagnostics()).missionId,'transport-yard');pass('legacy sample query cannot open another map');
   await click('[data-module="chassis_quadruped"]');await click('[data-category="motor"]');await click('[data-module="motor_low"]');

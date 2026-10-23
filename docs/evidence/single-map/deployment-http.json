@@ -1,36 +1,36 @@
 {
-  "checkedAt": "2026-10-23T07:57:36.476Z",
+  "checkedAt": "2026-10-23T10:47:51.080Z",
   "base": "http://121.199.30.133:3001",
   "checks": [
     {
       "path": "/",
       "status": 200,
-      "buildId": "build-ea726479bce3-20261023075353892"
+      "buildId": "build-4d0b7cd57705-20261023082140021"
     },
     {
       "path": "/index.html",
       "status": 200,
-      "buildId": "build-ea726479bce3-20261023075353892"
+      "buildId": "build-4d0b7cd57705-20261023082140021"
     },
     {
       "path": "/preview.html",
       "status": 200,
-      "buildId": "build-ea726479bce3-20261023075353892"
+      "buildId": "build-4d0b7cd57705-20261023082140021"
     },
     {
       "path": "/?test=0",
       "status": 200,
-      "buildId": "build-ea726479bce3-20261023075353892"
+      "buildId": "build-4d0b7cd57705-20261023082140021"
     },
     {
       "path": "/?test=1",
       "status": 200,
-      "buildId": "build-ea726479bce3-20261023075353892"
+      "buildId": "build-4d0b7cd57705-20261023082140021"
     },
     {
       "path": "/leaderboard.html",
       "status": 200,
-      "buildId": "build-ea726479bce3-20261023075353892"
+      "buildId": "build-4d0b7cd57705-20261023082140021"
     },
     {
       "path": "/api/health",
@@ -43,29 +43,29 @@
       "rulesVersion": "single-map-v3"
     },
     {
-      "path": "/assets/leaderboard-ak1FYIKr.js",
-      "status": 200,
-      "sha256": "17b31df63cfcf4593f763f5ef044c036f1037e742fa3ffc56f3c7e22e53ccdf2"
-    },
-    {
       "path": "/assets/leaderboard-CC_SHGEa.css",
       "status": 200,
       "sha256": "cf541e6c4da2934ad3ad5c2aab18381c8f870d4e6a18f78c99c4d9da44e24077"
     },
     {
-      "path": "/assets/preview-Bht7pOqW.js",
+      "path": "/assets/leaderboard-l1Fcjvse.js",
+      "status": 200,
+      "sha256": "92bfa72a814d30ff86cdd1b21975b9b5feca2a577b689b5709d973f37056f0d4"
+    },
+    {
+      "path": "/assets/preview-ckdv0jTD.js",
       "status": 200,
       "sha256": "d2a32840421496e872ade591618d2fa5c33797605d1aec04301717e5a90757d0"
     },
     {
-      "path": "/assets/preview-CrVFv03Y.css",
+      "path": "/assets/preview-DGKrJgRR.css",
       "status": 200,
-      "sha256": "de2f1f062e7c1cf05e884f8211b85487318146655fb28b08b7191ab668342a01"
+      "sha256": "21f8c152e2a152a4b9da5b79db4705fddd9af33e538f937ff63bb0097531a5ef"
     },
     {
-      "path": "/assets/previewBoot-CT1gha8I.js",
+      "path": "/assets/previewBoot-ChHyB7pE.js",
       "status": 200,
-      "sha256": "1fa43c86bc58093baabd735d8829fe4383e6f80e9d1381b79e7e85331b0fec04"
+      "sha256": "6196629f5d53814b348716ba6462ddaea83d504aae2b8af8a3daab8514d8ad70"
     }
   ]
 }

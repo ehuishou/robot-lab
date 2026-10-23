@@ -66,8 +66,9 @@ function turningApron(kit:ModelKit,parent:THREE.Object3D,mission:MissionDefiniti
   }
 }
 function arrow(kit:ModelKit,parent:THREE.Object3D,x:number,y:number,z:number,dz:number,material:THREE.Material):void {
-  const a=new THREE.Group();a.position.set(x,y,z);a.rotation.y=-Math.atan(dz);
-  for(const side of [-1,1])kit.box(a,[.48,.018,.09],[.06,0,side*.14],material,[0,-side*.65,0]);
+  const a=new THREE.Group();a.name='route-arrow';a.position.set(x,y,z);a.rotation.y=-Math.atan(dz);
+  // The chevron tip faces local +X, then follows the road tangent toward the finish.
+  for(const side of [-1,1])kit.box(a,[.48,.018,.09],[.06,0,side*.14],material,[0,side*.65,0]);
   parent.add(a);
 }
 export function createEnvironmentView(kit:ModelKit, mission:MissionDefinition): THREE.Group {

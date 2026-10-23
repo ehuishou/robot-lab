@@ -164,3 +164,6 @@ kbd{font:10px "Segoe UI",sans-serif;color:var(--muted);border:1px solid #5870847
 @media(max-width:380px){.category-tabs{flex-wrap:wrap}.player-actions{max-width:100%}.player-actions button{overflow-wrap:anywhere;max-width:100%}.tutorial-header .eyebrow{letter-spacing:1px;font-size:9px}}
 @media(max-height:500px){.tutorial-stops{display:flex;overflow-x:auto;padding-bottom:4px}.tutorial-stops button{flex:0 0 auto;padding:6px 10px;min-height:36px}.tutorial-map svg{max-height:38px;margin-top:0}.tutorial-body{padding-top:8px}.tutorial-dialog h2{font-size:20px;margin-top:8px}.tutorial-description{font-size:13px}.tutorial-figure svg{max-height:150px}}
 body:has(#map-tutorial[open]){overflow:hidden}
+
+/* Repository access in the page footer. */
+.preview-footer .github-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:44px;min-height:44px;margin-right:auto;padding:0 10px;border:1px solid transparent;border-radius:6px;color:var(--muted);text-decoration:none;font-size:12px}.preview-footer .github-link svg{flex-shrink:0}.preview-footer .github-link:hover{color:var(--cyan);background:#163342;border-color:var(--line)}.preview-footer .github-link:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
