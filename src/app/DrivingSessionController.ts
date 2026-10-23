@@ -42,8 +42,9 @@ export class DrivingSessionController {
     for (; steps < frame.steps && this.current.phase === 'running'; steps++) {
       const intent = this.input.poll();
       const interaction = intent.interact ? findNearbyInteraction(this.current) : null;
+      if (interaction?.kind === 'work' || interaction?.kind === 'stage') this.action(interaction);
       events.push(...this.apply({ kind: 'drive', deltaSeconds: DRIVING_STEP_SECONDS, intent,
-        interactions: interaction ? [interaction] : [] }));
+        interactions: interaction?.kind === 'pickup' || interaction?.kind === 'deliver' ? [interaction] : [] }));
     }
     if (this.current.phase !== 'running') {
       this.input.setEnabled(false);

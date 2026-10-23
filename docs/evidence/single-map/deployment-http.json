@@ -1,36 +1,36 @@
 {
-  "checkedAt": "2026-10-23T07:24:01.013Z",
+  "checkedAt": "2026-10-23T07:57:36.476Z",
   "base": "http://121.199.30.133:3001",
   "checks": [
     {
       "path": "/",
       "status": 200,
-      "buildId": "build-99133190399d-20261023043207192"
+      "buildId": "build-ea726479bce3-20261023075353892"
     },
     {
       "path": "/index.html",
       "status": 200,
-      "buildId": "build-99133190399d-20261023043207192"
+      "buildId": "build-ea726479bce3-20261023075353892"
     },
     {
       "path": "/preview.html",
       "status": 200,
-      "buildId": "build-99133190399d-20261023043207192"
+      "buildId": "build-ea726479bce3-20261023075353892"
     },
     {
       "path": "/?test=0",
       "status": 200,
-      "buildId": "build-99133190399d-20261023043207192"
+      "buildId": "build-ea726479bce3-20261023075353892"
     },
     {
       "path": "/?test=1",
       "status": 200,
-      "buildId": "build-99133190399d-20261023043207192"
+      "buildId": "build-ea726479bce3-20261023075353892"
     },
     {
       "path": "/leaderboard.html",
       "status": 200,
-      "buildId": "build-99133190399d-20261023043207192"
+      "buildId": "build-ea726479bce3-20261023075353892"
     },
     {
       "path": "/api/health",
@@ -43,9 +43,9 @@
       "rulesVersion": "single-map-v3"
     },
     {
-      "path": "/assets/leaderboard-B0iWwSGR.js",
+      "path": "/assets/leaderboard-ak1FYIKr.js",
       "status": 200,
-      "sha256": "3f462b39152083fd21edf824350c2fa43c87cfc0f194bf8395c76410e7576558"
+      "sha256": "17b31df63cfcf4593f763f5ef044c036f1037e742fa3ffc56f3c7e22e53ccdf2"
     },
     {
       "path": "/assets/leaderboard-CC_SHGEa.css",
@@ -53,19 +53,19 @@
       "sha256": "cf541e6c4da2934ad3ad5c2aab18381c8f870d4e6a18f78c99c4d9da44e24077"
     },
     {
-      "path": "/assets/preview-C9xNM2Z7.js",
+      "path": "/assets/preview-Bht7pOqW.js",
       "status": 200,
       "sha256": "d2a32840421496e872ade591618d2fa5c33797605d1aec04301717e5a90757d0"
     },
     {
-      "path": "/assets/preview-D1P9cYAt.css",
+      "path": "/assets/preview-CrVFv03Y.css",
       "status": 200,
-      "sha256": "085deca8d1caee823b42d602d20412288143f99f215de9213c3d8275dc1e57fb"
+      "sha256": "de2f1f062e7c1cf05e884f8211b85487318146655fb28b08b7191ab668342a01"
     },
     {
-      "path": "/assets/previewBoot-gYgQTU7y.js",
+      "path": "/assets/previewBoot-CT1gha8I.js",
       "status": 200,
-      "sha256": "7ebf46fb8350ddb2677f7e391a92f3c4e7a0470df694e46ee79cc87cb05a25dd"
+      "sha256": "1fa43c86bc58093baabd735d8829fe4383e6f80e9d1381b79e7e85331b0fec04"
     }
   ]
 }

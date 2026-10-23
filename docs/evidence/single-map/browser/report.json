@@ -2,6 +2,7 @@
   "cases": [
     "single map at root, normal by default, no difficulty picker",
     "legacy sample query cannot open another map",
+    "one interaction button handles touch charging and replaces old operation buttons",
     "route junction and direct choice preserve scene bounds on desktop, portrait and landscape",
     "backtracking after missing the near junction restores route buttons without moving the scene",
     "far junction can be selected while driving forward after reversing past it",
@@ -13,17 +14,17 @@
     "test mode shares same map"
   ],
   "exceptions": [],
-  "base": "http://127.0.0.1:50896",
-  "buildId": "build-61f131ef67c9-20261022141417328",
+  "base": "http://127.0.0.1:65449",
+  "buildId": "build-ea726479bce3-20261023075353892",
   "routeBounds": {
     "before": [
       {
         "y": 149,
-        "h": 398
+        "h": 452
       },
       {
         "y": 202,
-        "h": 415
+        "h": 469
       },
       {
         "y": 70,
@@ -33,11 +34,11 @@
     "during": [
       {
         "y": 149,
-        "h": 398
+        "h": 452
       },
       {
         "y": 202,
-        "h": 415
+        "h": 469
       },
       {
         "y": 70,
@@ -47,11 +48,11 @@
     "after": [
       {
         "y": 149,
-        "h": 398
+        "h": 452
       },
       {
         "y": 202,
-        "h": 415
+        "h": 469
       },
       {
         "y": 70,
@@ -60,14 +61,14 @@
     ]
   },
   "run": {
-    "time": 117.09999999999464,
-    "energy": 37.03460006047819,
+    "time": 102.24999999999548,
+    "energy": 39.427121164929915,
     "result": {
       "outcome": "succeeded",
       "score": {
-        "formalScore": 3188,
-        "timeBonus": 349,
-        "energyBonus": 529,
+        "formalScore": 3304,
+        "timeBonus": 431,
+        "energyBonus": 563,
         "cargoBonus": 2000,
         "budgetBonus": 310
       }

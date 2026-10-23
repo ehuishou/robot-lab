@@ -47,6 +47,50 @@ check('current configuration storage roundtrip and corrupt-save rejection',()=>{
  assert.equal(readPreviewConfiguration(unavailable,catalog).reason,'storageUnavailable');
  assert.equal(savePreviewConfiguration(unavailable,mission.recommendedConfiguration,catalog).saved,false);
 });
+check('context interaction resolves work and cargo in both directions, with safety guards',()=>{
+ const {findNearbyInteraction:nearby}=load('src/domain/mission/nearbyInteraction.ts');
+ const base=create({chassis:'chassis_wheel'});
+ for(const direction of [-1,1]){
+  const at=(xM)=>({...base,xM,energyRemainingUnits:base.energyRemainingUnits-5,
+   environment:{...base.environment,travelDirection:direction}});
+  for(const [x,kind,workKind] of [[38,'pickup'],[47,'work','charge'],[84.15,'work','clear'],[87.85,'work','clear']]){
+   const state=at(x),action=nearby(state);assert.equal(action?.kind,kind);if(workKind)assert.equal(action.workKind,workKind);
+   assert.equal(nearby({...state,speedMps:direction*.3}),null);
+   assert.equal(nearby({...state,phase:'paused'}),null);
+   assert.equal(nearby({...state,environment:{...state.environment,zM:1}}),null);
+   assert.equal(nearby({...state,environment:{...state.environment,work:{kind:'load'}}}),null);
+  }
+  assert.equal(nearby(at(44)),null);
+  assert.equal(nearby({...at(47),environment:{...at(47).environment,stationUsed:true}}),null);
+  assert.equal(nearby({...at(47),energyRemainingUnits:base.parameters.batteryCapacityUnits}),null);
+  assert.equal(nearby({...at(84.15),environment:{...at(84.15).environment,removed:{debris:1}}}),null);
+  const loaded=wait(send(at(38),{kind:'pickup',objectId:'cargo'}));
+  assert.equal(nearby(loaded)?.kind,'stage');
+  assert.equal(nearby({...loaded,xM:95})?.kind,'deliver');
+  assert.equal(nearby({...loaded,xM:47})?.workKind,'charge');
+  assert.equal(nearby({...loaded,xM:50}),null);
+ }
+});
+check('E and pointer interaction dispatch all operations once, with pause and busy protection',()=>{
+ const {DrivingSessionController}=load('src/app/DrivingSessionController.ts');
+ const base=create({chassis:'chassis_wheel'});
+ const loaded=wait(send({...base,xM:38},{kind:'pickup',objectId:'cargo'}));
+ for(const source of ['key','pointer'])for(const [state,workKind] of [
+  [{...base,xM:38},'load'],[{...loaded,xM:95},'unload'],[{...loaded,xM:38},'unload'],
+  [{...base,xM:47,energyRemainingUnits:base.energyRemainingUnits-5},'charge'],[{...base,xM:84.15},'clear']]){
+  const controller=new DrivingSessionController(state);controller.advanceFrame(0);
+  const press=(down)=>source==='key'?controller.input.setKey('e',down):controller.input.setAction('pointer:1','interact',down);
+  press(true);controller.advanceFrame(34);assert.equal(controller.state.environment.work?.kind,workKind);
+  const first=controller.state.environment.work;press(false);press(true);controller.advanceFrame(68);
+  assert.ok(controller.state.environment.work.seconds>first.seconds,'busy press must not restart work');
+  for(let t=102;t<=5500;t+=34)controller.advanceFrame(t);
+  assert.equal(controller.state.environment.work,null,'holding interaction must not repeat or stage loaded cargo');
+  if(workKind==='load')assert.equal(controller.state.cargo.carried.length,1);
+  if(workKind==='charge')assert.equal(controller.state.environment.stationUsed,true);
+  if(workKind==='clear')assert.equal(controller.state.environment.removed.debris,1);
+  press(false);controller.pause();press(true);controller.advanceFrame(5600);assert.equal(controller.state.environment.work,null);
+ }
+});
 check('one map, valid layout, real branch clearances',()=>{
 assert.equal('difficulty' in mission.challenge,false);
  assert.deepEqual(validateMission(mission,catalog,assets),{valid:true,issues:[]});

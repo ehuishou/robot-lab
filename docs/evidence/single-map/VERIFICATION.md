@@ -1,3 +1,14 @@
+# 统一交互与静态教学（2026-10-23，single-map-v3.4）
+
+- 最终线上构建build-ea726479bce3-20261023075353892，计分规则single-map-v3。统一交互按钮取代独立作业、暂存按钮，辅助按钮删除；自动辅助提示仍默认开启。忙碌时显示进度、暂停和非停稳状态禁用操作。
+- 教程保留静态SVG图、地图步骤导航、底盘路线选择及应对说明，删除装载/充能/清障演示与状态；登录后教学顺序、完成记忆和网址限定测试模式保留。
+- npm test：19项通过，新增统一交互双向接近、距离/侧向/速度/暂停/忙碌/电量限制、键盘及指针派发、长按不重复、交付优先于暂存等检查。
+- npm run test:browser：最终构建12项通过；键盘装卸、真实触屏充能/清障、旧按钮与辅助按钮删除、低功耗四足整局、双向选路、手机滑动及结算。390×844与844×390截图确认无控件叠压，选路不改变场景高度。
+- npm run test:physics、test:leaderboard（9项）、test:leaderboard:browser（11项）、test:tutorial（7项）通过。最终公网游戏12项、教学7项和部署HTTP/资源哈希验证通过；两次公网驾驶产生的专用QA成绩均已删除。
+- browser/为最终本地游戏验收，browser-deployed/为公网游戏验收，tutorial-browser/与tutorial-deployed/为图文教学验收，deployment-http.json为最终发布哈希证据。使用Edge模拟手机视口，未作iOS/Android真机GPU验证。
+
+---
+
 # 登录后地图教学（2026-10-23）
 
 - 线上构建build-99133190399d-20261023043207192；规则single-map-v3。浏览器证据在tutorial-browser/与tutorial-deployed/，发布HTTP证据在deployment-http.json。

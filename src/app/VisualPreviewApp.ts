@@ -1,7 +1,7 @@
 import { MapTutorial } from './MapTutorial';
 import { NicknameScores } from './NicknameScores';
 import { GameControlSelection } from '../input/GameControlSelection';
-import { beginWork, senseEnvironment, routePresentation, hasBypass, bypassBounds } from '../domain/simulation/environment';
+import { senseEnvironment, routePresentation, hasBypass, bypassBounds } from '../domain/simulation/environment';
 import { TRANSPORT_MISSION } from '../content/challenges';
 import { SCORE_WEIGHTS } from '../domain/mission/scoring';
 import { readBestScore, saveChallengeResult } from './ChallengeRecords';
@@ -62,7 +62,7 @@ export class VisualPreviewApp {
           <div class="viewport-caption"><span id="view-caption">灯光、材质与模块轮廓实时渲染</span><span id="terrain-caption"></span></div>
           <div class="camera-controls" role="group" aria-label="镜头控制"><button data-action="orbit-left" aria-label="向左旋转镜头">↶</button><button data-action="orbit-right" aria-label="向右旋转镜头">↷</button><button data-action="zoom-in" aria-label="拉近镜头">＋</button><button data-action="zoom-out" aria-label="拉远镜头">−</button><button data-action="loading">装载区</button><button data-action="delivery">交付区</button></div>
           <div id="hud-demo" class="hud-demo" hidden><div><span>任务时间 / 位置</span><strong id="hud-time"></strong></div><div><span>能源 / 速度</span><strong id="hud-energy"></strong><div class="energy-track"><i id="energy-fill"></i></div></div><div><span>运输目标</span><strong id="hud-objective"></strong></div><details id="physics-test" hidden><summary>物理测试</summary><button data-action="physics-push">轻推</button><button data-action="physics-topple">强推</button><button data-action="physics-reset">扶正</button><button data-action="physics-overlay" aria-pressed="false">显示受力</button><span id="physics-legend" hidden>橙：重心 · 青：支撑力 · 红：打滑</span></details><div id="interaction-prompt" class="control-legend" role="status" aria-live="polite"></div></div>
-          <div id="driving-panel" class="driving-panel" hidden><div class="driving-buttons" role="group" aria-label="驾驶操作"><div class="drive-cluster" role="group" aria-label="方向"><button data-drive="reverse" aria-label="按住倒退" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">←</span><span>倒退</span><kbd>A / ←</kbd></button><button data-drive="forward" aria-label="按住前进" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">→</span><span>前进</span><kbd>D / →</kbd></button></div><div class="drive-cluster drive-actions" role="group" aria-label="制动与交互"><button data-drive="brake" aria-label="按住刹车" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">▣</span><span>刹车</span><kbd>Space</kbd></button><button data-drive="interact" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">◇</span><span id="interaction-label">交互</span><kbd>E</kbd></button></div></div><div id="environment-controls" class="environment-controls" hidden><span id="route-status"></span><div class="route-choice" role="group" aria-label="选择路线"><button data-action="route-direct">↑ 直行</button><button data-action="route-bypass">↗ 走旁路 <small id="bypass-distance"></small></button></div><div class="route-tools"><button data-action="work">作业 / 充电</button><button data-action="stage">暂存货物</button><button data-action="assist">辅助：开</button></div></div><p><span>按住方向行驶 · 松开滑行</span><span>刹车停靠 · 点击交互装卸</span></p></div>
+          <div id="driving-panel" class="driving-panel" hidden><div class="driving-buttons" role="group" aria-label="驾驶操作"><div class="drive-cluster" role="group" aria-label="方向"><button data-drive="reverse" aria-label="按住倒退" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">←</span><span>倒退</span><kbd>A / ←</kbd></button><button data-drive="forward" aria-label="按住前进" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">→</span><span>前进</span><kbd>D / →</kbd></button></div><div class="drive-cluster drive-actions" role="group" aria-label="制动与交互"><button data-drive="brake" aria-label="按住刹车" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">▣</span><span>刹车</span><kbd>Space</kbd></button><button data-drive="interact" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">◇</span><span id="interaction-label">交互</span><kbd>E</kbd></button></div></div><div id="environment-controls" class="environment-controls" hidden><span id="route-status"></span><div class="route-choice" role="group" aria-label="选择路线"><button data-action="route-direct">↑ 直行</button><button data-action="route-bypass">↗ 走旁路 <small id="bypass-distance"></small></button></div></div><p><span>按住方向行驶 · 松开滑行</span><span>停稳后交互 · 装卸 / 充能 / 清障</span></p></div>
           <div id="pause-overlay" class="pause-overlay" hidden><h2>任务已暂停</h2><button class="primary" data-action="resume">继续驾驶</button><button data-action="retry">重新开始</button><button data-page="configuration">返回配置</button></div>
           <div id="result-demo" class="result-demo" hidden><h2 id="result-title">任务结算</h2><p id="result-reason"></p><div class="result-row"><span>货物交付</span><strong id="result-delivery"></strong></div><div class="result-row"><span>到达终点</span><strong id="result-finish"></strong></div><div class="result-row"><span>耗时 / 剩余能源</span><strong id="result-metrics"></strong></div><div id="challenge-result" class="challenge-result" hidden></div><p id="record-status" class="muted" role="status"></p><button data-action="retry-score">重试保存</button><div class="result-actions"><button class="primary" data-action="retry">重新挑战</button><button data-page="configuration">返回配置</button></div></div>
         </section>
@@ -151,9 +151,6 @@ export class VisualPreviewApp {
         if(section) this.controller?.action({kind:'route',sectionId:section.id,route:button.dataset.action==='route-direct'?'direct':'bypass'});
         break;
       }
-      case 'work': this.controller?.action({kind:'work'}); break;
-      case 'stage': if(this.controller)this.controller.action({kind:'stage',cargoIds:this.controller.state.cargo.carried.map(c=>c.id)});break;
-      case 'assist': if(this.controller?.state.environment)this.controller.action({kind:'assist',enabled:!this.controller.state.environment.assist});break;
       case 'retry-score': this.submitScore(); break;
       case 'start': case 'retry': this.startSession(); break;
       case 'pause': this.pauseSession(); break;
@@ -286,10 +283,6 @@ export class VisualPreviewApp {
       bypassButton.hidden=!junction||!hasBypass(junction);
       directButton.hidden=!junction;
       for(const action of ['route-direct','route-bypass']) {const b=this.root.querySelector<HTMLButtonElement>('[data-action="'+action+'"]')!;b.dataset.sectionId=junction?.id??'';b.disabled=state.phase!=='running'||!!work||!junction||Math.abs(state.speedMps)>.75;b.setAttribute('aria-pressed',String(!!presentation.section&&presentation.choice===(action==='route-direct'?'direct':'bypass')))}
-      const ready=beginWork(state.mission.environment,env,state.configuration,state.xM,state.speedMps,state.cargo.carried.reduce((a,c)=>a+c.massKg,0),state.parameters.payloadKg,state.parameters.batteryCapacityUnits-state.energyRemainingUnits);
-      const workButton=this.root.querySelector<HTMLButtonElement>('[data-action="work"]')!;workButton.disabled=state.phase!=='running'||!ready;workButton.textContent=ready?.work?.kind==='charge'?'充电 5s':ready?.work?.kind==='clear'?'清障 '+ready.work.duration.toFixed(0)+'s':'作业 / 充电';
-      const stage=this.root.querySelector<HTMLButtonElement>('[data-action="stage"]')!;stage.disabled=state.phase!=='running'||!!work||!state.cargo.carried.length||Math.abs(state.speedMps)>.25||Math.abs(env.zM)>.5||!state.mission.platforms.some(p=>state.xM>=p.startM&&state.xM<=p.endM);
-      const assist=this.root.querySelector<HTMLButtonElement>('[data-action="assist"]')!;assist.textContent='辅助：'+(env.assist?'开':'关');assist.disabled=state.phase!=='running';
     }
     if(state.quadruped) {
       for(const b of this.root.querySelectorAll<HTMLButtonElement>('#physics-test button')) b.disabled = state.phase !== 'running';
@@ -308,24 +301,34 @@ export class VisualPreviewApp {
       : state.cargo.carried.length ? '已交 '+deliveredCount+'/'+targets.length+' · 携带 '+carriedKg+' kg · 前往 '+this.deliveryZone.xM+' m卸货'
       : '已交 '+deliveredCount+'/'+targets.length+' · 前往 '+(nextCargo?.xM ?? this.loadingItem.xM)+' m装载（可选运输加分）';
     const interaction = findNearbyInteraction(state);
-    const actionLabel = interaction?.kind === 'deliver' ? '卸货' : interaction?.kind === 'pickup' ? '装载' : '交互';
-    this.element('interaction-label').textContent = actionLabel;
-    this.root.querySelector<HTMLButtonElement>('[data-drive="interact"]')!.dataset.ready = String(!!interaction && state.phase === 'running');
+    const work = state.environment?.work;
+    const workLabel = work ? ({ charge: '充能中', clear: '清障中', load: '装载中', unload: '卸货中' }[work.kind]) : null;
+    const actionLabel = interaction?.kind === 'deliver' ? '卸货' : interaction?.kind === 'pickup' ? '装载'
+      : interaction?.kind === 'work' ? (interaction.workKind === 'charge' ? '充能' : '清障')
+      : interaction?.kind === 'stage' ? '暂存' : null;
+    this.element('interaction-label').textContent = workLabel ?? (actionLabel ? '交互·' + actionLabel : '交互');
+    const interactionButton = this.root.querySelector<HTMLButtonElement>('[data-drive="interact"]')!;
+    interactionButton.dataset.ready = String(!!interaction);
+    interactionButton.setAttribute('aria-label', workLabel ?? (actionLabel ? '交互：' + actionLabel : '交互：请靠近目标并停稳'));
     const interactionCargo = interaction?.kind === 'pickup' ? targets.find(item=>item.id===interaction.objectId) : undefined;
     const canLoadNext = nextCargo && carriedKg + nextCargo.cargo.massKg <= state.cargo.capacityKg;
     if (!delivered && state.cargo.carried.length && canLoadNext) this.element('hud-objective').textContent = '已交 '+deliveredCount+'/'+targets.length+' · 前往 '+nextCargo.xM+' m装载';
     const bridge = state.mission.environment?.sections.find(s=>s.kind==='bridge');
     const bridgeBounds = bridge ? bypassBounds(bridge) : null;
-    const approachingBridge = bridgeBounds && (state.environment?.travelDirection===-1
-      ? state.xM>=bridgeBounds.endM && state.xM<=bridgeBounds.endM+8
-      : state.xM>=bridgeBounds.startM-8 && state.xM<=bridgeBounds.startM);
+    const approachingBridge = bridgeBounds && (
+      (state.xM>=bridgeBounds.startM-8 && state.xM<=bridgeBounds.startM)
+      || (state.xM>=bridgeBounds.endM && state.xM<=bridgeBounds.endM+8));
     const atBridgeJunction = bridge && state.environment && routePresentation(state.mission.environment!,state.environment,state.xM).junction?.id===bridge.id;
     const routeHint = atBridgeJunction ? '分岔检测点：前进或倒车均可选路，减速后选择直行或旁路' : approachingBridge ? (state.configuration.chassis==='chassis_quadruped' ? '前方分岔：四足可直行翻桥，或选平地旁路' : '前方分岔：请减速选择平地旁路，拱桥仅限四足') : null;
     const finishHint = state.xM>=this.mission.layout.find(item=>item.kind==='deliveryZone')!.startM ? '终点 '+this.finishObjective.xM+' m · 继续前进，驶过终点结算' : null;
     const prompt = interaction?.kind === 'deliver' ? 'E / 交互：卸货到交付平台' : interaction?.kind === 'pickup' ? `E / 交互：装载 ${interactionCargo?.cargo.massKg ?? ''} kg 货箱`
-      : state.phase === 'paused' ? '任务已暂停' : routeHint ?? finishHint ?? 'Space 刹车 · E 交互';
+      : state.phase === 'paused' ? '任务已暂停'
+      : work ? workLabel + ' · 剩余 ' + Math.max(0, work.duration - work.seconds).toFixed(1) + ' s'
+      : interaction?.kind === 'work' ? 'E / 交互：' + actionLabel + ' · ' + interaction.duration.toFixed(0) + ' s'
+      : interaction?.kind === 'stage' ? 'E / 交互：暂存货物（此处不计交付分，可回来装载）'
+      : routeHint ?? finishHint ?? '停稳后 E / 交互：装卸、充能、清障';
     if (this.element('interaction-prompt').textContent !== prompt) this.element('interaction-prompt').textContent = prompt;
-    for (const button of this.root.querySelectorAll<HTMLButtonElement>('[data-drive],[data-action="pause"]')) button.disabled = state.phase !== 'running';
+    for (const button of this.root.querySelectorAll<HTMLButtonElement>('[data-drive],[data-action="pause"]')) button.disabled = state.phase !== 'running' || (button.dataset.drive === 'interact' && !interaction);
     if (!state.result) return;
     this.element('result-title').textContent = state.result.outcome === 'succeeded' ? '行程完成' : '运输任务失败';
     const reasons = { overturned: '机器人已翻倒。请调整配置、降低速度，或重新挑战。', timeExceeded: `超过 ${state.mission.hardLimits.maxTimeSeconds} 秒。建议使用刹车停靠，装卸后及时驶向终点。`, energyExhausted: `能源耗尽。可调整电池、选择适配路线，或在47m充能站停靠补能。` };

@@ -9,6 +9,7 @@ const evidence = resolve('docs/evidence/single-map', process.argv.some(arg => ar
 mkdirSync(evidence, { recursive: true });
 let browser, socket, server, seq = 0;
 const pending = new Map();
+const qaNickname = process.env.ROBOT_QA_NICKNAME ?? 'QA-browser';
 const report = { cases: [], exceptions: [], base: '' };
 async function until(fn, timeout = 45000) {
   const deadline = Date.now() + timeout;
@@ -35,7 +36,7 @@ async function preview(url) {
     assert.notEqual(state, 'error', await evaluate('document.getElementById("preview-error")?.textContent'));
     return state === 'ready';
   });
-  await evaluate(`(()=>{if(document.querySelector('.nickname-dialog')?.open){document.querySelector('#nickname-input').value='QA-browser';document.querySelector('#nickname-form').requestSubmit();}for(let i=0;i<7&&document.querySelector('#map-tutorial')?.open;i++)document.querySelector('#tutorial-next').click();return true})()`);
+  await evaluate(`(()=>{if(document.querySelector('.nickname-dialog')?.open){document.querySelector('#nickname-input').value=${JSON.stringify(qaNickname)};document.querySelector('#nickname-form').requestSubmit();}for(let i=0;i<7&&document.querySelector('#map-tutorial')?.open;i++)document.querySelector('#tutorial-next').click();return true})()`);
 }
 async function screenshot(name) {
   const shot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
@@ -86,7 +87,15 @@ try {
     const brake=target!==100&&(Math.abs(d)<v*v/7+.2 || d*v<-.1);
     await hold(brake?' ':d>=0?'d':'a');await delay(70);
   }throw Error('driving timeout '+target);}
-  async function work(){await click('[data-action="work"]');await until(async()=>!(await diagnostics()).session.environment.work);}
+  async function touchInteraction(expected){
+    assert.equal(await evaluate('document.getElementById("interaction-label").textContent'),'交互·'+expected);
+    const point=await evaluate('(()=>{const r=document.querySelector("[data-drive=interact]").getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()');
+    await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point]});
+    await delay(80);await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await until(async()=>!!(await diagnostics()).session.environment.work);
+    assert.equal(await evaluate('document.querySelector("[data-drive=interact]").disabled'),true);
+    await until(async()=>!(await diagnostics()).session.environment.work);
+  }
   async function interact(){await key('e',true);await delay(80);await key('e',false);await until(async()=>!(await diagnostics()).session.environment.work);}
   async function shot(name){await hold(null);await delay(350);await screenshot(name);}
   await preview(report.base+'/');report.buildId=(await diagnostics()).buildId;
@@ -100,7 +109,13 @@ try {
   await click('[data-action="start"]');await go(24);await shot('desktop-sand');
   assert.equal(await evaluate('document.querySelector("[data-action=route-bypass]").hidden'),true);
   await go(38);await interact();assert.equal((await diagnostics()).session.cargo.carried.length,1);await shot('desktop-cargo');
-  await go(47);await work();assert.equal((await diagnostics()).session.environment.stationUsed,true);await shot('desktop-charger');
+  await go(47);
+  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  await delay(250);await shot('mobile-interaction-charge');await touchInteraction('充能');
+  await send('Emulation.setDeviceMetricsOverride',{width:1366,height:900,deviceScaleFactor:1,mobile:false});assert.equal((await diagnostics()).session.environment.stationUsed,true);await shot('desktop-charger');
+  assert.equal(await evaluate('document.querySelectorAll("[data-action=work],[data-action=stage],[data-action=assist]").length'),0);
+  assert.equal(await evaluate('document.querySelectorAll("[data-drive=interact]").length'),1);
+  pass('one interaction button handles touch charging and replaces old operation buttons');
   const sizes=[[1366,900],[390,844],[844,390]];
   async function routeBoxes(){const boxes=[];for(const [width,height] of sizes){
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<1000});await delay(150);
@@ -131,9 +146,9 @@ try {
   await click('[data-action="route-bypass"]');assert.equal((await diagnostics()).session.environment.choices.bridge,'bypass');
   await click('[data-action="route-direct"]');
   pass('far junction can be selected while driving forward after reversing past it');
-  await go(84.15);await shot('desktop-large-box');await work();assert.equal((await diagnostics()).session.environment.removed.debris,1);await shot('desktop-cleared-box');
+  await go(84.15);await shot('desktop-large-box');await touchInteraction('清障');assert.equal((await diagnostics()).session.environment.removed.debris,1);await shot('desktop-cleared-box');
   await go(95);await interact();assert.equal((await diagnostics()).session.cargo.delivered.length,1);
-  assert.ok((await evaluate('document.getElementById("interaction-prompt").textContent')).includes('终点'));
+  await until(async()=>(await evaluate('document.getElementById("interaction-prompt").textContent')).includes('终点'));
   await shot('desktop-finish-approach');
   await go(100);await shot('desktop-result');
   const s=(await diagnostics()).session;assert.equal(s.result.score.cargoBonus,2000);assert.ok(s.result.score.formalScore>2000);

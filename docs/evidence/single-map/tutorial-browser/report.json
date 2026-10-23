@@ -1,7 +1,7 @@
 {
   "cases": [
     "nickname login precedes visual tutorial; no timed run starts",
-    "seven illustrated steps, map progress, route choices and operation demos; finish returns to assembly",
+    "seven illustrated steps, map progress, route choices and static operation guidance; finish returns to assembly",
     "completion survives reload; tutorial can be replayed and navigated backwards",
     "mobile portrait, landscape and 320px: no overflow; fixed next button accepts real touches",
     "URL-only test mode; existing nickname without tutorial completion receives onboarding",
@@ -9,6 +9,6 @@
     "no uncaught browser exceptions"
   ],
   "exceptions": [],
-  "base": "http://127.0.0.1:63084",
+  "base": "http://127.0.0.1:57392",
   "passed": true
 }

@@ -100,11 +100,10 @@ kbd{font:10px "Segoe UI",sans-serif;color:var(--muted);border:1px solid #5870847
 .score-total strong{color:var(--cyan);font-size:24px}
 @media(max-width:600px){.challenge-result .result-row{gap:8px;font-size:11px}}
 
-/* Route decisions get their own fixed row, above optional operations. */
-.environment-controls { height:130px; display:grid; grid-template-rows:20px 48px 44px; gap:6px; padding-top:6px; font-size:12px; font-variant-numeric:tabular-nums; }
-.environment-controls > span { display:block; line-height:20px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
-.environment-controls .route-choice { display:grid; grid-template-columns:1fr 1.35fr; gap:8px; }
-.environment-controls .route-tools { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+/* Reserve route space; nearby operations share the interaction button. */
+.environment-controls { height:76px; display:grid; grid-template-columns:minmax(0,1fr); grid-template-rows:20px 44px; gap:6px; padding-top:6px; font-size:12px; font-variant-numeric:tabular-nums; }
+.environment-controls > span { display:block; align-self:center; line-height:20px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.environment-controls .route-choice { grid-column:1/-1; display:grid; grid-template-columns:1fr 1.35fr; gap:8px; }
 .environment-controls button { min-width:44px; min-height:44px; padding:6px; font-size:12px; white-space:nowrap; touch-action:manipulation; }
 .route-choice button { font-size:14px; font-weight:650; border-width:2px; background:#234155; }
 .route-choice small { margin-left:5px; font-size:11px; }
@@ -114,13 +113,12 @@ kbd{font:10px "Segoe UI",sans-serif;color:var(--muted);border:1px solid #5870847
 .environment-controls[data-route-state=active] .route-choice button:disabled { opacity:.8; }
 #preview-app .driving-panel, #preview-app .driving-panel *, #preview-app .session-toolbar, #preview-app .session-toolbar * { -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; -webkit-user-drag:none; }
 #preview-app input, #preview-app textarea, #preview-app [contenteditable=true] { -webkit-user-select:text; user-select:text; }
-#preview-app[data-playing=true] #three-viewport { bottom:300px; }
+#preview-app[data-playing=true] #three-viewport { bottom:246px; }
 @media(max-width:900px),(max-height:500px) and (max-width:1100px) { #preview-app[data-playing=true] #three-viewport { bottom:auto; } }
 @media(max-height:500px) and (max-width:1100px) {
-  .environment-controls { height:76px; grid-template-columns:1.3fr 1fr; grid-template-rows:20px 44px; gap:6px; }
-  .environment-controls > span { grid-column:1/-1; }
+  .environment-controls { height:76px; grid-template-columns:minmax(0,1fr); grid-template-rows:20px 44px; gap:6px; }
+  .environment-controls > span { grid-column:1; }
   .environment-controls .route-choice { grid-row:2; }
-  .environment-controls .route-tools { grid-row:2; }
   .environment-controls button,.route-choice button { font-size:11px; padding:3px; }
   .route-choice small { font-size:10px; margin-left:2px; }
 }
@@ -137,11 +135,10 @@ kbd{font:10px "Segoe UI",sans-serif;color:var(--muted);border:1px solid #5870847
 
 /* Reserve route space throughout the drive so junctions never resize the scene. */
 .environment-controls .route-choice{grid-row:2}
-.environment-controls .route-tools{grid-row:3}
 .environment-controls:not([data-route-state=junction]) .route-choice{visibility:hidden}
 #preview-app .module-panel,#preview-app .module-panel button{touch-action:pan-y}
 @media(max-height:500px) and (max-width:1100px){
-  .environment-controls .route-choice,.environment-controls .route-tools{grid-row:2}
+  .environment-controls .route-choice{grid-row:2}
 }
 
 @media(min-width:901px) and (min-height:501px){

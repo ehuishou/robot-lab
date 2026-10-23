@@ -92,10 +92,10 @@ try {
     assert.equal(await evaluate("Number(document.querySelector('#map-tutorial').dataset.step)"),index);
     assert.equal(await evaluate("document.querySelectorAll('.tutorial-stops [aria-current=step]').length"),1);
     assert.equal(await evaluate("document.activeElement.id"),'tutorial-heading');
+    assert.equal(await evaluate("document.querySelector('#tutorial-demo')"),null);
     if([2,3,5].includes(index)){
-      const before=await evaluate("document.querySelector('.tutorial-figure svg').innerHTML");
-      await click('#tutorial-demo');assert.notEqual(await evaluate("document.querySelector('.tutorial-figure svg').innerHTML"),before);
-      assert.equal(await evaluate("document.querySelector('#tutorial-demo').getAttribute('aria-pressed')"),'true');
+      assert.ok((await evaluate("document.querySelector('.tutorial-description').textContent")).includes('交互'));
+      assert.equal(await evaluate("document.querySelectorAll('.tutorial-figure svg').length"),1);
     }
     if(index===4){
       await click('#tutorial-chassis_wheel');
@@ -111,7 +111,7 @@ try {
   }
   assert.equal(await evaluate("document.querySelector('#map-tutorial').open"),false);
   assert.equal(await evaluate("document.activeElement.dataset.category"),'chassis');
-  pass('seven illustrated steps, map progress, route choices and operation demos; finish returns to assembly');
+  pass('seven illustrated steps, map progress, route choices and static operation guidance; finish returns to assembly');
   await navigate();assert.equal(await evaluate("document.querySelector('#map-tutorial').open"),false);
   await click('#tutorial-button');assert.equal(await evaluate("document.querySelector('#map-tutorial').open"),true);
   await click('[data-tutorial-step="4"]');await click('#tutorial-prev');assert.equal(await evaluate("document.querySelector('#map-tutorial').dataset.step"),'3');
