@@ -1,0 +1,141 @@
+{
+  "date": "2026-10-26",
+  "baselineCommit": "e7b5d48",
+  "baselineBuildId": "build-3637a8a7bad7-20261024024255852",
+  "currentBuildId": "build-53803a2c68cb-20261026085313744",
+  "source": "Before/after production builds, same Edge CDP browser harness and named screenshots; real-time drive positions are approximate, not identical frames.",
+  "scenes": [
+    {
+      "scene": "desktop-sand",
+      "before": {
+        "drawCalls": 710,
+        "triangles": 85846,
+        "resources": {
+          "geometries": 225,
+          "materials": 53,
+          "textures": 31
+        }
+      },
+      "after": {
+        "drawCalls": 581,
+        "triangles": 88186,
+        "resources": {
+          "geometries": 225,
+          "materials": 53,
+          "textures": 33
+        }
+      },
+      "drawCallReductionPercent": 18.2
+    },
+    {
+      "scene": "desktop-junction",
+      "before": {
+        "drawCalls": 791,
+        "triangles": 94748,
+        "resources": {
+          "geometries": 225,
+          "materials": 53,
+          "textures": 31
+        }
+      },
+      "after": {
+        "drawCalls": 668,
+        "triangles": 98600,
+        "resources": {
+          "geometries": 225,
+          "materials": 53,
+          "textures": 33
+        }
+      },
+      "drawCallReductionPercent": 15.5
+    },
+    {
+      "scene": "desktop-bridge",
+      "before": {
+        "drawCalls": 702,
+        "triangles": 81778,
+        "resources": {
+          "geometries": 225,
+          "materials": 53,
+          "textures": 31
+        }
+      },
+      "after": {
+        "drawCalls": 556,
+        "triangles": 82426,
+        "resources": {
+          "geometries": 225,
+          "materials": 53,
+          "textures": 33
+        }
+      },
+      "drawCallReductionPercent": 20.8
+    },
+    {
+      "scene": "desktop-charger",
+      "before": {
+        "drawCalls": 805,
+        "triangles": 98822,
+        "resources": {
+          "geometries": 225,
+          "materials": 53,
+          "textures": 31
+        }
+      },
+      "after": {
+        "drawCalls": 680,
+        "triangles": 101514,
+        "resources": {
+          "geometries": 225,
+          "materials": 53,
+          "textures": 33
+        }
+      },
+      "drawCallReductionPercent": 15.5
+    },
+    {
+      "scene": "mobile-390x844",
+      "before": {
+        "drawCalls": 371,
+        "triangles": 54214,
+        "resources": {
+          "geometries": 220,
+          "materials": 53,
+          "textures": 31
+        }
+      },
+      "after": {
+        "drawCalls": 325,
+        "triangles": 55534,
+        "resources": {
+          "geometries": 220,
+          "materials": 53,
+          "textures": 33
+        }
+      },
+      "drawCallReductionPercent": 12.4
+    },
+    {
+      "scene": "mobile-844x390",
+      "before": {
+        "drawCalls": 1138,
+        "triangles": 139784,
+        "resources": {
+          "geometries": 220,
+          "materials": 53,
+          "textures": 31
+        }
+      },
+      "after": {
+        "drawCalls": 966,
+        "triangles": 144824,
+        "resources": {
+          "geometries": 220,
+          "materials": 53,
+          "textures": 33
+        }
+      },
+      "drawCallReductionPercent": 15.1
+    }
+  ]
+}

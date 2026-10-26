@@ -30,7 +30,7 @@ function strip(kit: ModelKit, parent: THREE.Object3D, mission: MissionDefinition
     }
     // Match Three.js front-face winding: the road top faces +Y.
     for(let i=0;i<indices.length;i+=3)[indices[i+1],indices[i+2]]=[indices[i+2],indices[i+1]];
-    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();return g;
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(vertices.flatMap((_,i)=>i%3===0?[vertices[i],vertices[i+2]]:[]),2));g.setIndex(indices);g.computeVertexNormals();return g;
   });
   kit.mesh(parent,geometry,material,[0,0,0]);
 }
@@ -57,7 +57,7 @@ function turningApron(kit:ModelKit,parent:THREE.Object3D,mission:MissionDefiniti
       vertices.push(a.x,terrain.sample(a.x).heightM+.018,a.y,a.x,terrain.sample(a.x).heightM-.09,a.y,b.x,terrain.sample(b.x).heightM+.018,b.y,b.x,terrain.sample(b.x).heightM-.09,b.y);
       indices.push(k,k+2,k+1,k+1,k+2,k+3);
     }
-    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();g.userData.topVertexCount=topCount;return g;
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(vertices.flatMap((_,i)=>i%3===0?[vertices[i],vertices[i+2]]:[]),2));g.setIndex(indices);g.computeVertexNormals();g.userData.topVertexCount=topCount;return g;
   });
   kit.mesh(parent,geometry,material,[0,0,0]);
   for(let i=0;i<hull.length;i++){

@@ -16,6 +16,42 @@ export class ModelKit {
     wall: new THREE.MeshStandardMaterial({ color: '#2b4053', roughness: 0.82, metalness: 0.25 }),
     window: new THREE.MeshStandardMaterial({ color: '#75a8bc', emissive: '#4b708d', emissiveIntensity: 0.45, roughness: 0.32 }),
   };
+  private surfaceDetailsReady = false;
+
+  constructor(private readonly anisotropy = 1) {}
+
+  // Linear grayscale modulation: one small shared map supplies colour grain,
+  // roughness and millimetre-scale relief, without downloads or extra geometry.
+  private prepareSurfaceDetails(): void {
+    if (this.surfaceDetailsReady) return;
+    this.surfaceDetailsReady = true;
+    for (const [kind, seed] of [['ground', 17], ['soil', 71]] as const) {
+      const size = 128, data = new Uint8Array(size * size * 4);
+      let state = seed;
+      for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+        state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+        const grain = state / 0xffffffff;
+        const u = x / size * Math.PI * 2, v = y / size * Math.PI * 2;
+        const pattern = kind === 'soil' ? Math.sin(u * 3 + Math.sin(v) * .6) * 9 : Math.cos(u) * Math.cos(v) * 3;
+        const value = Math.round(220 + grain * 24 + pattern), offset = (y * size + x) * 4;
+        data[offset] = data[offset + 1] = data[offset + 2] = value;
+        data[offset + 3] = 255;
+      }
+      const texture = new THREE.DataTexture(data, size, size);
+      texture.name = `${kind}-surface-detail`;
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      texture.magFilter = THREE.LinearFilter;
+      texture.minFilter = THREE.LinearMipmapLinearFilter;
+      texture.generateMipmaps = true;
+      texture.anisotropy = this.anisotropy;
+      texture.needsUpdate = true;
+      this.textures.push(texture);
+      const material = this.materials[kind];
+      material.map = material.roughnessMap = material.bumpMap = texture;
+      material.bumpScale = kind === 'soil' ? .024 : .009;
+    }
+  }
+
   private readonly geometries = new Map<string, THREE.BufferGeometry>();
   private readonly textures: THREE.Texture[] = [];
   private readonly labelMaterials: THREE.Material[] = [];
@@ -23,6 +59,7 @@ export class ModelKit {
 
   mesh(parent: THREE.Object3D, geometry: THREE.BufferGeometry, material: THREE.Material,
     position: readonly [number, number, number], rotation: readonly [number, number, number] = [0, 0, 0]): THREE.Mesh {
+    if (material === this.materials.ground || material === this.materials.soil) this.prepareSurfaceDetails();
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(...position);
     mesh.rotation.set(...rotation);
@@ -45,9 +82,10 @@ export class ModelKit {
       const surface = new THREE.PlaneGeometry(endM - startM, widthM, Math.ceil((endM - startM) / 0.5), 1);
       surface.rotateX(-Math.PI / 2);
       surface.translate((startM + endM) / 2, 0, zM);
-      const positions = surface.getAttribute('position');
+      const positions = surface.getAttribute('position'), uv = surface.getAttribute('uv');
       for (let index = 0; index < positions.count; index++) {
         positions.setY(index, terrain.sample(positions.getX(index)).heightM + offsetM);
+        uv.setXY(index, positions.getX(index), positions.getZ(index));
       }
       surface.computeVertexNormals();
       return surface;
@@ -105,30 +143,40 @@ export class ModelKit {
 
   label(parent: THREE.Object3D, text: string, width: number, height: number, position: readonly [number, number, number],
     color = '#dce8ec', background = '#162d3e'): THREE.Mesh {
-    const key = `${text}:${color}:${background}`;
+    const aspect = width / height;
+    const key = `${text}:${color}:${background}:${aspect}`;
     let material = this.labelCache.get(key);
     if (!material) {
       const canvas = document.createElement('canvas');
-      canvas.width = 768;
-      canvas.height = 192;
+      canvas.width = Math.max(128, Math.min(1536, Math.round(192 * aspect)));
+      canvas.height = Math.max(1, Math.round(canvas.width / aspect));
       const context = canvas.getContext('2d');
       if (!context) throw new Error('无法生成场景标识。');
       context.fillStyle = background;
       context.fillRect(0, 0, canvas.width, canvas.height);
       context.fillStyle = color;
-      context.font = '600 62px "Microsoft YaHei", sans-serif';
+      let fontSize = Math.round(canvas.height * .43);
+      context.font = `600 ${fontSize}px "Microsoft YaHei", sans-serif`;
+      const availableWidth = canvas.width * .9;
+      const measuredWidth = context.measureText(text).width;
+      if (measuredWidth > availableWidth) {
+        fontSize = Math.max(1, Math.floor(fontSize * availableWidth / measuredWidth));
+        context.font = `600 ${fontSize}px "Microsoft YaHei", sans-serif`;
+      }
       context.textAlign = 'center';
       context.textBaseline = 'middle';
-      context.fillText(text, 384, 96, 720);
+      context.fillText(text, canvas.width / 2, canvas.height / 2);
       const texture = new THREE.CanvasTexture(canvas);
       texture.colorSpace = THREE.SRGBColorSpace;
+      texture.anisotropy = this.anisotropy;
       this.textures.push(texture);
-      material = new THREE.MeshBasicMaterial({ map: texture });
+      material = new THREE.MeshBasicMaterial({ map: texture, toneMapped: false });
       this.labelMaterials.push(material);
       this.labelCache.set(key, material);
     }
     const plane = this.mesh(parent, this.geometry(`label:${width}:${height}`, () => new THREE.PlaneGeometry(width, height)), material, position);
     plane.castShadow = false;
+    plane.receiveShadow = false;
     return plane;
   }
 

@@ -12,11 +12,14 @@
     "new score survives reload",
     "native vertical swipes over category and component buttons scroll without selecting",
     "mobile touch driving, portrait and landscape controls, pause",
-    "test mode shares same map"
+    "test mode shares same map",
+    "branch traversal keeps key and rim lighting aligned with robot on desktop and mobile",
+    "returning from branch to configuration resets lateral lighting"
   ],
   "exceptions": [],
-  "base": "http://127.0.0.1:55959",
-  "buildId": "build-4d0b7cd57705-20261023082140021",
+  "consoleErrors": [],
+  "base": "http://127.0.0.1:64900",
+  "buildId": "build-53803a2c68cb-20261026092213881",
   "repositoryLinks": [
     {
       "width": 1366,
@@ -79,6 +82,904 @@
       "overflow": false
     }
   ],
+  "rendering": {
+    "github-footer-1366x900": {
+      "viewport": {
+        "width": 757,
+        "height": 772,
+        "drawingBufferWidth": 757,
+        "drawingBufferHeight": 772,
+        "pixelRatio": 1,
+        "cameraAspect": 0.9805699481865285
+      },
+      "drawCalls": 407,
+      "triangles": 70782,
+      "resources": {
+        "geometries": 220,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 40,
+        "rimXM": 40,
+        "keyZM": 0,
+        "rimZM": 0
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 38,
+      "robotZM": 0.4
+    },
+    "github-footer-390x844": {
+      "viewport": {
+        "width": 368,
+        "height": 428,
+        "drawingBufferWidth": 368,
+        "drawingBufferHeight": 428,
+        "pixelRatio": 1,
+        "cameraAspect": 0.8598130841121495
+      },
+      "drawCalls": 393,
+      "triangles": 68790,
+      "resources": {
+        "geometries": 220,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 40,
+        "rimXM": 40,
+        "keyZM": 0,
+        "rimZM": 0
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 38,
+      "robotZM": 0.4
+    },
+    "github-footer-844x390": {
+      "viewport": {
+        "width": 574,
+        "height": 580,
+        "drawingBufferWidth": 574,
+        "drawingBufferHeight": 580,
+        "pixelRatio": 1,
+        "cameraAspect": 0.9896551724137931
+      },
+      "drawCalls": 407,
+      "triangles": 70782,
+      "resources": {
+        "geometries": 220,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 40,
+        "rimXM": 40,
+        "keyZM": 0,
+        "rimZM": 0
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 38,
+      "robotZM": 0.4
+    },
+    "github-footer-320x568": {
+      "viewport": {
+        "width": 298,
+        "height": 428,
+        "drawingBufferWidth": 298,
+        "drawingBufferHeight": 428,
+        "pixelRatio": 1,
+        "cameraAspect": 0.6962616822429907
+      },
+      "drawCalls": 384,
+      "triangles": 67242,
+      "resources": {
+        "geometries": 220,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 40,
+        "rimXM": 40,
+        "keyZM": 0,
+        "rimZM": 0
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 38,
+      "robotZM": 0.4
+    },
+    "desktop-configuration": {
+      "viewport": {
+        "width": 757,
+        "height": 772,
+        "drawingBufferWidth": 757,
+        "drawingBufferHeight": 772,
+        "pixelRatio": 1,
+        "cameraAspect": 0.9805699481865285
+      },
+      "drawCalls": 407,
+      "triangles": 70782,
+      "resources": {
+        "geometries": 220,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 40,
+        "rimXM": 40,
+        "keyZM": 0,
+        "rimZM": 0
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 38,
+      "robotZM": 0.4
+    },
+    "desktop-sand": {
+      "viewport": {
+        "width": 1301,
+        "height": 452,
+        "drawingBufferWidth": 1301,
+        "drawingBufferHeight": 452,
+        "pixelRatio": 1,
+        "cameraAspect": 2.8783185840707963
+      },
+      "drawCalls": 579,
+      "triangles": 88450,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 24.337186953200423,
+        "rimXM": 24.337186953200423,
+        "keyZM": 0.24001620916733374,
+        "rimZM": 0.24001620916733374
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 24.337186953200423,
+      "robotZM": 0.24001620916733374
+    },
+    "desktop-cargo": {
+      "viewport": {
+        "width": 1301,
+        "height": 452,
+        "drawingBufferWidth": 1301,
+        "drawingBufferHeight": 452,
+        "pixelRatio": 1,
+        "cameraAspect": 2.8783185840707963
+      },
+      "drawCalls": 621,
+      "triangles": 96234,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 38.300861259198626,
+        "rimXM": 38.300861259198626,
+        "keyZM": 0.20000405636440755,
+        "rimZM": 0.20000405636440755
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 38.300861259198626,
+      "robotZM": 0.20000405636440755
+    },
+    "mobile-interaction-charge": {
+      "viewport": {
+        "width": 390,
+        "height": 469,
+        "drawingBufferWidth": 390,
+        "drawingBufferHeight": 469,
+        "pixelRatio": 1,
+        "cameraAspect": 0.8315565031982942
+      },
+      "drawCalls": 279,
+      "triangles": 44794,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 47.222892475372,
+        "rimXM": 47.222892475372,
+        "keyZM": 0.4087282889581811,
+        "rimZM": 0.4087282889581811
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 47.222892475372,
+      "robotZM": 0.4087282889581811
+    },
+    "desktop-charger": {
+      "viewport": {
+        "width": 1301,
+        "height": 452,
+        "drawingBufferWidth": 1301,
+        "drawingBufferHeight": 452,
+        "pixelRatio": 1,
+        "cameraAspect": 2.8783185840707963
+      },
+      "drawCalls": 679,
+      "triangles": 101502,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 47.22207303830636,
+        "rimXM": 47.22207303830636,
+        "keyZM": 0.4056793922599525,
+        "rimZM": 0.4056793922599525
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 47.22207303830636,
+      "robotZM": 0.4056793922599525
+    },
+    "desktop-junction": {
+      "viewport": {
+        "width": 1301,
+        "height": 452,
+        "drawingBufferWidth": 1301,
+        "drawingBufferHeight": 452,
+        "pixelRatio": 1,
+        "cameraAspect": 2.8783185840707963
+      },
+      "drawCalls": 660,
+      "triangles": 97362,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 54.39488482974492,
+        "rimXM": 54.39488482974492,
+        "keyZM": 0.44940000763218735,
+        "rimZM": 0.44940000763218735
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 54.39488482974492,
+      "robotZM": 0.44940000763218735
+    },
+    "junction-390x844": {
+      "viewport": {
+        "width": 390,
+        "height": 469,
+        "drawingBufferWidth": 390,
+        "drawingBufferHeight": 469,
+        "pixelRatio": 1,
+        "cameraAspect": 0.8315565031982942
+      },
+      "drawCalls": 274,
+      "triangles": 48872,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 54.39464904355655,
+        "rimXM": 54.39464904355655,
+        "keyZM": 0.44969112675664324,
+        "rimZM": 0.44969112675664324
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 54.39464904355655,
+      "robotZM": 0.44969112675664324
+    },
+    "junction-844x390": {
+      "viewport": {
+        "width": 844,
+        "height": 187,
+        "drawingBufferWidth": 844,
+        "drawingBufferHeight": 187,
+        "pixelRatio": 1,
+        "cameraAspect": 4.5133689839572195
+      },
+      "drawCalls": 816,
+      "triangles": 114188,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 54.39465176008304,
+        "rimXM": 54.39465176008304,
+        "keyZM": 0.44970637722612944,
+        "rimZM": 0.44970637722612944
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 54.39465176008304,
+      "robotZM": 0.44970637722612944
+    },
+    "desktop-junction-reverse": {
+      "viewport": {
+        "width": 1301,
+        "height": 452,
+        "drawingBufferWidth": 1301,
+        "drawingBufferHeight": 452,
+        "pixelRatio": 1,
+        "cameraAspect": 2.8783185840707963
+      },
+      "drawCalls": 670,
+      "triangles": 99200,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 54.083507786905386,
+        "rimXM": 54.083507786905386,
+        "keyZM": 0.24800286405199726,
+        "rimZM": 0.24800286405199726
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 54.083507786905386,
+      "robotZM": 0.24800286405199726
+    },
+    "desktop-bridge": {
+      "viewport": {
+        "width": 1301,
+        "height": 452,
+        "drawingBufferWidth": 1301,
+        "drawingBufferHeight": 452,
+        "pixelRatio": 1,
+        "cameraAspect": 2.8783185840707963
+      },
+      "drawCalls": 557,
+      "triangles": 82486,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 65.86243795132094,
+        "rimXM": 65.86243795132094,
+        "keyZM": 0.45920357554600727,
+        "rimZM": 0.45920357554600727
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 65.86243795132094,
+      "robotZM": 0.45920357554600727
+    },
+    "desktop-bridge-exit": {
+      "viewport": {
+        "width": 1301,
+        "height": 452,
+        "drawingBufferWidth": 1301,
+        "drawingBufferHeight": 452,
+        "pixelRatio": 1,
+        "cameraAspect": 2.8783185840707963
+      },
+      "drawCalls": 481,
+      "triangles": 72672,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 78.0903349139862,
+        "rimXM": 78.0903349139862,
+        "keyZM": 0.24574941845529663,
+        "rimZM": 0.24574941845529663
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 78.0903349139862,
+      "robotZM": 0.24574941845529663
+    },
+    "desktop-large-box": {
+      "viewport": {
+        "width": 1301,
+        "height": 452,
+        "drawingBufferWidth": 1301,
+        "drawingBufferHeight": 452,
+        "pixelRatio": 1,
+        "cameraAspect": 2.8783185840707963
+      },
+      "drawCalls": 370,
+      "triangles": 54490,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 84.15,
+        "rimXM": 84.15,
+        "keyZM": 0.48530816405920185,
+        "rimZM": 0.48530816405920185
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 84.14999999999999,
+      "robotZM": 0.48530816405920185
+    },
+    "desktop-cleared-box": {
+      "viewport": {
+        "width": 1301,
+        "height": 452,
+        "drawingBufferWidth": 1301,
+        "drawingBufferHeight": 452,
+        "pixelRatio": 1,
+        "cameraAspect": 2.8783185840707963
+      },
+      "drawCalls": 370,
+      "triangles": 54490,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 84.14870017912659,
+        "rimXM": 84.14870017912659,
+        "keyZM": 0.49134586653906265,
+        "rimZM": 0.49134586653906265
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 84.14870017912659,
+      "robotZM": 0.49134586653906265
+    },
+    "desktop-finish-approach": {
+      "viewport": {
+        "width": 1301,
+        "height": 452,
+        "drawingBufferWidth": 1301,
+        "drawingBufferHeight": 452,
+        "pixelRatio": 1,
+        "cameraAspect": 2.8783185840707963
+      },
+      "drawCalls": 302,
+      "triangles": 47502,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 95.20016359016316,
+        "rimXM": 95.20016359016316,
+        "keyZM": 0.19998558933934832,
+        "rimZM": 0.19998558933934832
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 95.20016359016316,
+      "robotZM": 0.19998558933934832
+    },
+    "desktop-result": {
+      "viewport": {
+        "width": 1301,
+        "height": 452,
+        "drawingBufferWidth": 1301,
+        "drawingBufferHeight": 452,
+        "pixelRatio": 1,
+        "cameraAspect": 2.8783185840707963
+      },
+      "drawCalls": 280,
+      "triangles": 45440,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 100,
+        "rimXM": 100,
+        "keyZM": 0.36985246025852014,
+        "rimZM": 0.36985246025852014
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 100,
+      "robotZM": 0.36985246025852014
+    },
+    "result-actions-1366x900": {
+      "viewport": {
+        "width": 1301,
+        "height": 452,
+        "drawingBufferWidth": 1301,
+        "drawingBufferHeight": 452,
+        "pixelRatio": 1,
+        "cameraAspect": 2.8783185840707963
+      },
+      "drawCalls": 280,
+      "triangles": 45440,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 100,
+        "rimXM": 100,
+        "keyZM": 0.36985246025852014,
+        "rimZM": 0.36985246025852014
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 100,
+      "robotZM": 0.36985246025852014
+    },
+    "result-actions-390x844": {
+      "viewport": {
+        "width": 390,
+        "height": 801,
+        "drawingBufferWidth": 390,
+        "drawingBufferHeight": 801,
+        "pixelRatio": 1,
+        "cameraAspect": 0.4868913857677903
+      },
+      "drawCalls": 182,
+      "triangles": 30404,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 100,
+        "rimXM": 100,
+        "keyZM": 0.36985246025852014,
+        "rimZM": 0.36985246025852014
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 100,
+      "robotZM": 0.36985246025852014
+    },
+    "result-actions-844x390": {
+      "viewport": {
+        "width": 844,
+        "height": 390,
+        "drawingBufferWidth": 844,
+        "drawingBufferHeight": 390,
+        "pixelRatio": 1,
+        "cameraAspect": 2.164102564102564
+      },
+      "drawCalls": 269,
+      "triangles": 44354,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 100,
+        "rimXM": 100,
+        "keyZM": 0.36985246025852014,
+        "rimZM": 0.36985246025852014
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 100,
+      "robotZM": 0.36985246025852014
+    },
+    "mobile-configuration": {
+      "viewport": {
+        "width": 368,
+        "height": 428,
+        "drawingBufferWidth": 368,
+        "drawingBufferHeight": 428,
+        "pixelRatio": 1,
+        "cameraAspect": 0.8598130841121495
+      },
+      "drawCalls": 393,
+      "triangles": 68790,
+      "resources": {
+        "geometries": 220,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 40,
+        "rimXM": 40,
+        "keyZM": 0,
+        "rimZM": 0
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 38,
+      "robotZM": 0.4
+    },
+    "mobile-driving": {
+      "viewport": {
+        "width": 390,
+        "height": 469,
+        "drawingBufferWidth": 390,
+        "drawingBufferHeight": 469,
+        "pixelRatio": 1,
+        "cameraAspect": 0.8315565031982942
+      },
+      "drawCalls": 322,
+      "triangles": 55498,
+      "resources": {
+        "geometries": 220,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 3.3562153904235803,
+        "rimXM": 3.3562153904235803,
+        "keyZM": 0.4,
+        "rimZM": 0.4
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 3.3562153904235803,
+      "robotZM": 0.4
+    },
+    "mobile-390x844": {
+      "viewport": {
+        "width": 390,
+        "height": 469,
+        "drawingBufferWidth": 390,
+        "drawingBufferHeight": 469,
+        "pixelRatio": 1,
+        "cameraAspect": 0.8315565031982942
+      },
+      "drawCalls": 325,
+      "triangles": 55534,
+      "resources": {
+        "geometries": 220,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 4.909616334801384,
+        "rimXM": 4.909616334801384,
+        "keyZM": 0.4,
+        "rimZM": 0.4
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 4.909616334801384,
+      "robotZM": 0.4
+    },
+    "mobile-844x390": {
+      "viewport": {
+        "width": 844,
+        "height": 187,
+        "drawingBufferWidth": 844,
+        "drawingBufferHeight": 187,
+        "pixelRatio": 1,
+        "cameraAspect": 4.5133689839572195
+      },
+      "drawCalls": 966,
+      "triangles": 144824,
+      "resources": {
+        "geometries": 220,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 5.667401803758249,
+        "rimXM": 5.667401803758249,
+        "keyZM": 0.4,
+        "rimZM": 0.4
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 5.667401803758249,
+      "robotZM": 0.4
+    },
+    "desktop-bypass-lighting": {
+      "viewport": {
+        "width": 1301,
+        "height": 452,
+        "drawingBufferWidth": 1301,
+        "drawingBufferHeight": 452,
+        "pixelRatio": 1,
+        "cameraAspect": 2.8783185840707963
+      },
+      "drawCalls": 747,
+      "triangles": 109336,
+      "resources": {
+        "geometries": 220,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 65.83862415279876,
+        "rimXM": 65.83862415279876,
+        "keyZM": 6.329093086964351,
+        "rimZM": 6.329093086964351
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 65.83862415279876,
+      "robotZM": 6.329093086964351
+    },
+    "mobile-bypass-lighting": {
+      "viewport": {
+        "width": 390,
+        "height": 469,
+        "drawingBufferWidth": 390,
+        "drawingBufferHeight": 469,
+        "pixelRatio": 1,
+        "cameraAspect": 0.8315565031982942
+      },
+      "drawCalls": 469,
+      "triangles": 81244,
+      "resources": {
+        "geometries": 220,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 65.83862415279876,
+        "rimXM": 65.83862415279876,
+        "keyZM": 6.329093086964351,
+        "rimZM": 6.329093086964351
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 65.83862415279876,
+      "robotZM": 6.329093086964351
+    }
+  },
   "routeBounds": {
     "before": [
       {
@@ -124,18 +1025,26 @@
     ]
   },
   "run": {
-    "time": 94.01666666666262,
-    "energy": 40.784570018535554,
+    "time": 125.4833333333275,
+    "energy": 35.596098289340716,
     "result": {
       "outcome": "succeeded",
       "score": {
-        "formalScore": 3369,
-        "timeBonus": 477,
-        "energyBonus": 582,
+        "formalScore": 3120,
+        "timeBonus": 302,
+        "energyBonus": 508,
         "cargoBonus": 2000,
         "budgetBonus": 310
       }
     }
+  },
+  "bypassLighting": {
+    "environment": true,
+    "environmentIntensity": 0.65,
+    "keyXM": 65.83862415279876,
+    "rimXM": 65.83862415279876,
+    "keyZM": 6.329093086964351,
+    "rimZM": 6.329093086964351
   },
   "passed": true
 }

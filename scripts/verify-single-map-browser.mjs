@@ -11,7 +11,7 @@ let browser, socket, server, seq = 0;
 const pending = new Map();
 const openedWindows = [];
 const qaNickname = process.env.ROBOT_QA_NICKNAME ?? 'QA-browser';
-const report = { cases: [], exceptions: [], base: '' };
+const report = { cases: [], exceptions: [], consoleErrors: [], base: '' };
 async function until(fn, timeout = 45000) {
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) { const value = await fn(); if (value) return value; await delay(100); }
@@ -42,6 +42,13 @@ async function preview(url) {
 async function screenshot(name) {
   const shot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
   writeFileSync(resolve(evidence, name + '.png'), Buffer.from(shot.data, 'base64'));
+  const state = await diagnostics();
+  (report.rendering ??= {})[name] = {
+    viewport: state.renderer.viewport, drawCalls: state.renderer.drawCalls,
+    triangles: state.renderer.triangles, resources: state.renderer.resources,
+    lighting: state.renderer.lighting, terrain: state.renderer.terrain,
+    robotXM: state.renderer.robotXM, robotZM: state.renderer.robotZM,
+  };
 }
 function pass(name) { console.log('PASS ' + name); report.cases.push(name); }
 try {
@@ -73,6 +80,8 @@ try {
       if (message.error) waiter.reject(new Error(JSON.stringify(message.error))); else waiter.done(message.result);
     } else if (message.method === 'Page.windowOpen') openedWindows.push(message.params);
     else if (message.method === 'Runtime.exceptionThrown') report.exceptions.push(message.params.exceptionDetails);
+    else if (message.method === 'Runtime.consoleAPICalled' && message.params.type === 'error')
+      report.consoleErrors.push(message.params.args.map(arg => arg.value ?? arg.description).join(' '));
   });
   await send('Page.enable'); await send('Runtime.enable');
   await send('Emulation.setDeviceMetricsOverride', { width: 1366, height: 900, deviceScaleFactor: 1, mobile: false });
@@ -214,6 +223,25 @@ try {
   }
   await click('[data-action="pause"]');assert.equal((await diagnostics()).session.phase,'paused');pass('mobile touch driving, portrait and landscape controls, pause');
   await preview(report.base+'/?test=1');assert.equal((await diagnostics()).testMode,true);assert.equal((await diagnostics()).missionId,'transport-yard');pass('test mode shares same map');
+  // Drive the actual branch before checking that lighting follows its lateral offset.
+  await send('Emulation.setDeviceMetricsOverride',{width:1366,height:900,deviceScaleFactor:1,mobile:false});
+  await click('[data-action="recommended"]');await click('[data-action="start"]');
+  await go(54);await click('[data-action="route-bypass"]');await go(66);
+  await click('[data-action="pause"]');await shot('desktop-bypass-lighting');
+  const branch=(await diagnostics()).renderer;
+  assert.ok(Math.abs(branch.robotZM)>2,'robot must actually be on the branch');
+  assert.ok(Math.abs(branch.lighting.keyZM-branch.robotZM)<1e-6);
+  assert.ok(Math.abs(branch.lighting.rimZM-branch.robotZM)<1e-6);
+  report.bypassLighting=branch.lighting;
+  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  await shot('mobile-bypass-lighting');
+  pass('branch traversal keeps key and rim lighting aligned with robot on desktop and mobile');
+  await click('#pause-overlay [data-page="configuration"]');
+  const reset=(await diagnostics()).renderer;
+  assert.ok(Math.abs(reset.lighting.keyZM-reset.robotZM)<1e-6);
+  assert.ok(Math.abs(reset.lighting.rimZM-reset.robotZM)<1e-6);
+  pass('returning from branch to configuration resets lateral lighting');
+  assert.equal(report.consoleErrors.length,0,JSON.stringify(report.consoleErrors));
   assert.equal(report.exceptions.length,0,JSON.stringify(report.exceptions));report.passed=true;
 
 } catch (error) {

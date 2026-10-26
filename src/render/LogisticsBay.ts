@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import type { MissionDefinition } from '../domain/mission/definition';
 import { createTerrainSampler } from '../domain/simulation/terrain';
 import { ModelKit } from './ModelKit';
+import { batchStaticMeshes } from './StaticBatch';
 import { PREVIEW_ASSETS } from '../content/assets';
 
 export function createCargoView(kit: ModelKit, massKg = 8): THREE.Group {
@@ -88,6 +89,8 @@ export function createLogisticsBay(kit: ModelKit, mission: MissionDefinition): T
       kit.housing(facade, 0.22, 0.9, 0.22, [xM + side * 3.2, 0.45, -6.8], orange);
       kit.box(facade, [0.24, 0.1, 0.24], [xM + side * 3.2, 0.68, -6.8], dark);
     }
+    // Only these fourteen decorative facades are static batching candidates.
+    batchStaticMeshes(facade);
   }
   for (const xM of [8, 33, 50, 80, 98]) {
     const heightM = terrain.sample(xM).heightM;

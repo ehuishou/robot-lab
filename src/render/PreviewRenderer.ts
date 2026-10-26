@@ -1,4 +1,4 @@
-﻿import { createEnvironmentView, updateEnvironmentView } from './EnvironmentView';
+import { createEnvironmentView, updateEnvironmentView } from './EnvironmentView';
 import { routePose, environmentTerrain, ROUTE_LANE_OFFSET_M, routeDistance } from '../domain/simulation/environment';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -8,6 +8,7 @@ import { createTerrainSampler } from '../domain/simulation/terrain';
 import type { TerrainSampler } from '../domain/simulation/terrain';
 import { PhysicsOverlay } from './PhysicsOverlay';
 import { ModelKit } from './ModelKit';
+import { disposeStaticBatches } from './StaticBatch';
 import { createRobotView } from './RobotView';
 import { bodyOrigin } from '../domain/simulation/quadruped';
 import { ChassisAnimation } from './ChassisAnimation';
@@ -19,9 +20,9 @@ export class PreviewRenderer {
   private readonly renderer: THREE.WebGLRenderer;
   private readonly scene = new THREE.Scene();
   private readonly camera = new THREE.PerspectiveCamera(35, 1, 0.1, 160);
-  private readonly kit = new ModelKit();
+  private readonly kit: ModelKit;
   private readonly physicsOverlay = new PhysicsOverlay();
-  private worldKit = new ModelKit();
+  private worldKit: ModelKit;
   private terrain: TerrainSampler;
   private readonly key = new THREE.DirectionalLight('#ffe6c7', 3.5);
   private readonly rim = new THREE.DirectionalLight('#a0ddff', 1.9);
@@ -59,6 +60,9 @@ export class PreviewRenderer {
     private readonly onFailure: (error: unknown) => void) {
     this.terrain = createTerrainSampler(mission.terrain);
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+    const anisotropy = Math.min(4, this.renderer.capabilities.getMaxAnisotropy());
+    this.kit = new ModelKit(anisotropy);
+    this.worldKit = new ModelKit(anisotropy);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -131,11 +135,12 @@ export class PreviewRenderer {
   setMission(mission: MissionDefinition): void {
     if (mission.id === this.mission.id) return;
     const terrain = createTerrainSampler(mission.terrain);
-    const kit = new ModelKit();
-    let world: THREE.Group;
+    const kit = new ModelKit(Math.min(4, this.renderer.capabilities.getMaxAnisotropy()));
+    let world: THREE.Group | undefined;
     try { world = createLogisticsBay(kit, mission); world.add(createEnvironmentView(kit, mission)); }
-    catch (error) { kit.dispose(); throw error; }
+    catch (error) { if (world) disposeStaticBatches(world); kit.dispose(); throw error; }
     this.scene.remove(this.world);
+    disposeStaticBatches(this.world);
     this.world.clear();
     this.worldKit.dispose();
     this.worldKit = kit;
@@ -168,6 +173,7 @@ export class PreviewRenderer {
       this.robot.position.set(focusXM, sample.heightM, 0.4);
       this.robot.rotation.z = THREE.MathUtils.degToRad(sample.slopeDegrees);
     }
+    this.positionLights(sample.heightM);
     if (!this.snapshot) { this.locomotion.reset(); this.locomotion.update(focusXM, this.terrain); }
     this.yaw = 0;
     this.zoom = 1;
@@ -258,7 +264,8 @@ export class PreviewRenderer {
         materials: robotResources.materials + worldResources.materials, textures: robotResources.textures + worldResources.textures }, drawCalls: this.renderer.info.render.calls,
       triangles: this.renderer.info.render.triangles, activeLoop: this.frameId !== null && !this.disposed && !this.suspended,
       lighting: { environment: !!this.scene.environment, environmentIntensity: this.scene.environmentIntensity,
-        keyXM: this.key.target.position.x, rimXM: this.rim.target.position.x },
+        keyXM: this.key.target.position.x, rimXM: this.rim.target.position.x,
+        keyZM: this.key.target.position.z, rimZM: this.rim.target.position.z },
       disposed: this.disposed, robotXM: this.robot.position.x, robotHeightM: this.robot.position.y,
       robotSlopeDegrees: THREE.MathUtils.radToDeg(this.robot.rotation.z), carriedCrateVisible: this.carriedCrate.visible,
       terrain: { id: this.terrain.id, maxSurfaceErrorM, loadingHeightM: this.world.getObjectByName('loading-platform')?.position.y },
@@ -279,6 +286,7 @@ export class PreviewRenderer {
     window.removeEventListener('resize', this.onResize);
     document.removeEventListener('visibilitychange', this.onVisibility);
     this.renderer.domElement.removeEventListener('webglcontextlost', this.onContextLost);
+    disposeStaticBatches(this.world);
     this.scene.clear();
     this.scene.environment = null;
     this.environment.dispose();
@@ -325,11 +333,11 @@ export class PreviewRenderer {
   }
 
   private positionLights(heightM: number): void {
-    this.key.position.set(this.focusXM - 5, heightM + 10, 7);
-    this.key.target.position.set(this.focusXM, heightM, 0);
+    this.key.position.set(this.focusXM - 5, heightM + 10, this.robot.position.z + 7);
+    this.key.target.position.set(this.focusXM, heightM, this.robot.position.z);
     this.key.target.updateMatrixWorld();
-    this.rim.position.set(this.focusXM + 6, heightM + 6, -6);
-    this.rim.target.position.set(this.focusXM, heightM + 1, 0);
+    this.rim.position.set(this.focusXM + 6, heightM + 6, this.robot.position.z - 6);
+    this.rim.target.position.set(this.focusXM, heightM + 1, this.robot.position.z);
     this.rim.target.updateMatrixWorld();
   }
 
@@ -345,4 +353,3 @@ export class PreviewRenderer {
     }
   };
 }
-
