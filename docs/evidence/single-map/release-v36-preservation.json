@@ -1,0 +1,20 @@
+{
+    "checkedAt":  "2026-10-26T09:43:35.4307842Z",
+    "buildId":  "build-53803a2c68cb-20261026092213881",
+    "packageSha256":  "5d77a0181d8f8e89d29b1f1cd55e5873ecee61b66b9a49cf282ce81d03062a1c",
+    "leaderboardSha256BeforeDeploy":  "0d226dc3a3d6c0f99b617f4fcf5eee23f93b682e768858697ce20d801789ac7f",
+    "leaderboardSha256ImmediatelyAfterDeploy":  "0d226dc3a3d6c0f99b617f4fcf5eee23f93b682e768858697ce20d801789ac7f",
+    "qaScoreDeleted":  true,
+    "qaNickname":  "QA-v36-1026-0922",
+    "originalEntries":  7,
+    "unchangedOriginalEntries":  7,
+    "currentEntries":  7,
+    "revision":  30,
+    "leaderboardSha256AfterQaCleanup":  "ae94cd4fefd4a0c9962dbd6025be32142f4e71eab65fb0a8d58bb466a572a7e6",
+    "adminPasswordFileUnchanged":  true,
+    "currentApiRunning":  true,
+    "previousApiStopped":  true,
+    "rollbackResourcesPresent":  true,
+    "repositoryPublic":  true,
+    "note":  "QA score submission and deletion legitimately advance revision and change file hash; all original stored entries were compared and remained byte-equivalent."
+}

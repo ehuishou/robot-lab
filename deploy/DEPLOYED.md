@@ -1,3 +1,19 @@
+# 2026-10-26 渲染优化版部署记录
+
+- 当前构建：build-53803a2c68cb-20261026092213881；Git发布标签single-map-v3.6；实现提交636673c；计分规则仍为single-map-v3。
+- 本版仅优化地表材质、路牌文字、静态仓库立面批处理和旁路光照跟随。地图、组件参数、速度、能耗、路线、评分、统一交互、教程及昵称/排行榜规则均不变。
+- 服务器部署于2026-10-26 09:32 UTC（北京时间17:32）。游戏 http://121.199.30.133:3001/；独立排行榜仍仅通过网址进入，游戏内不增加入口。
+- 上传包SHA-256：5d77a0181d8f8e89d29b1f1cd55e5873ecee61b66b9a49cf282ce81d03062a1c；远端传输校验一致。生产JS/CSS逐字节校验与本地一致，六个页面入口、健康和榜单API检查通过，见deployment-http.json。
+- 部署瞬间前后排行榜文件SHA-256均为0d226dc3a3d6c0f99b617f4fcf5eee23f93b682e768858697ce20d801789ac7f；管理密码文件校验值不变。数据/凭据未打入部署包，目录权限700，密码文件600。
+- 本地生产构建、19项领域、54套四足配置物理回归、渲染回归（含35个箭头）、15项游戏浏览器、9项榜单API、11项榜单浏览器及7项教程检查通过。
+- 公网15项游戏浏览器、7项图文教学与5项昵称检查通过；低功耗四足完成运输、充能、过桥、清障、交付与结算：3234分，任务110.8秒，剩余能量37.8023。无未捕获异常或浏览器console.error。
+- 公网验收后仅删除专用QA-v36-1026-0922成绩；原有7条成绩逐条比对完全未变，最终7条、修订号30。测试写入及删除正常改变了榜单文件哈希，未恢复旧数据覆盖当前文件，见release-v36-preservation.json。
+- 当前静态目录/opt/robot-lab/releases/build-53803a2c68cb-20261026092213881；API容器robot-lab-api-build-53803a2c68cb-20261026092213881与Nginx均运行，健康检查正常。GitHub仓库ehuishou/robot-lab保持public。
+- 上一发布single-map-v3.5/build-4d0b7cd57705-20261023082140021的静态目录、API服务与已停止容器均保留；Nginx备份/opt/robot-lab/nginx.before-build-53803a2c68cb-20261026092213881.conf。可按update.sh的回滚顺序停止新API、启动旧API、恢复Nginx配置与current链接并更新api-current；务必保持单写进程，不回写成绩数据。部署前榜单备份保留在私有data目录，仅供核对。
+- 真实手机GPU与iOS/Android实机未验证。Vite既有CJS弃用与主包超过500kB提示仍在；本次draw call下降不等于同幅度FPS提升，详见graphics-report.md。
+
+---
+
 # 2026-10-23 地面箭头与GitHub入口部署记录
 
 - 当前构建：build-4d0b7cd57705-20261023082140021；Git发布标签single-map-v3.5；计分规则仍为single-map-v3。
@@ -114,6 +130,7 @@ mv -Tf /opt/robot-lab/current.rollback /opt/robot-lab/current
 ```
 
 ---
+
 # 2026-10-20 单地图清理版部署记录
 
 - 访问地址：http://121.199.30.133:3001/
@@ -135,6 +152,7 @@ mv -Tf /opt/robot-lab/current.rollback /opt/robot-lab/current
 ```
 
 ---
+
 # 2026-10-19 部署记录
 
 - 访问地址：http://121.199.30.133:3001/
@@ -155,6 +173,7 @@ mv -Tf /opt/robot-lab/current.rollback /opt/robot-lab/current
 `
 
 ---
+
 # 2026-10-18 部署记录
 
 - 访问地址：http://121.199.30.133:3001/

@@ -1,36 +1,36 @@
 {
-  "checkedAt": "2026-10-23T10:47:51.080Z",
+  "checkedAt": "2026-10-26T09:44:06.242Z",
   "base": "http://121.199.30.133:3001",
   "checks": [
     {
       "path": "/",
       "status": 200,
-      "buildId": "build-4d0b7cd57705-20261023082140021"
+      "buildId": "build-53803a2c68cb-20261026092213881"
     },
     {
       "path": "/index.html",
       "status": 200,
-      "buildId": "build-4d0b7cd57705-20261023082140021"
+      "buildId": "build-53803a2c68cb-20261026092213881"
     },
     {
       "path": "/preview.html",
       "status": 200,
-      "buildId": "build-4d0b7cd57705-20261023082140021"
+      "buildId": "build-53803a2c68cb-20261026092213881"
     },
     {
       "path": "/?test=0",
       "status": 200,
-      "buildId": "build-4d0b7cd57705-20261023082140021"
+      "buildId": "build-53803a2c68cb-20261026092213881"
     },
     {
       "path": "/?test=1",
       "status": 200,
-      "buildId": "build-4d0b7cd57705-20261023082140021"
+      "buildId": "build-53803a2c68cb-20261026092213881"
     },
     {
       "path": "/leaderboard.html",
       "status": 200,
-      "buildId": "build-4d0b7cd57705-20261023082140021"
+      "buildId": "build-53803a2c68cb-20261026092213881"
     },
     {
       "path": "/api/health",
@@ -63,9 +63,9 @@
       "sha256": "21f8c152e2a152a4b9da5b79db4705fddd9af33e538f937ff63bb0097531a5ef"
     },
     {
-      "path": "/assets/previewBoot-ChHyB7pE.js",
+      "path": "/assets/previewBoot-Dm1gE5Kw.js",
       "status": 200,
-      "sha256": "6196629f5d53814b348716ba6462ddaea83d504aae2b8af8a3daab8514d8ad70"
+      "sha256": "cba9f1af45f8ee618804a29b6e64616091dbd3b9fcdb0ad37be48fdc0ab08ced"
     }
   ]
 }
