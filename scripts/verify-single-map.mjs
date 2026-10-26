@@ -91,6 +91,61 @@ check('E and pointer interaction dispatch all operations once, with pause and bu
   press(false);controller.pause();press(true);controller.advanceFrame(5600);assert.equal(controller.state.environment.work,null);
  }
 });
+check('bridge decision pauses either junction in either direction and freezes the whole session',()=>{
+ const {DrivingSessionController}=load('src/app/DrivingSessionController.ts');
+ for(const chassis of ['chassis_wheel','chassis_track','chassis_quadruped'])for(const xM of [54,78])for(const direction of [-1,1]){
+  const initial={...create({chassis}),xM,speedMps:direction*3};
+  const controller=new DrivingSessionController(initial);
+  controller.input.setKey(direction>0?'d':'a',true);
+  const frame=controller.advanceFrame(0);
+  assert.equal(frame.steps,0);assert.ok(frame.events.some(e=>e.kind==='paused'));
+  assert.equal(controller.pendingBridgeSectionId,'bridge');assert.equal(controller.state.phase,'paused');
+  const frozen=controller.state;
+  for(const t of [34,1000,60000]){controller.advanceFrame(t);assert.deepEqual(controller.state,frozen);}
+  controller.resume();assert.equal(controller.state.phase,'paused');
+  assert.equal(controller.action({kind:'work'}),false);
+  assert.equal(controller.action({kind:'route',sectionId:'sand',route:'bypass'}),false);
+  if(chassis!=='chassis_quadruped')assert.equal(controller.action({kind:'route',sectionId:'bridge',route:'direct'}),false);
+  const route=chassis==='chassis_quadruped'?'direct':'bypass';
+  assert.equal(controller.action({kind:'route',sectionId:'bridge',route}),true);
+  assert.equal(controller.state.environment.choices.bridge,route);assert.equal(controller.state.phase,'running');
+  assert.equal(controller.pendingBridgeSectionId,null);
+  assert.deepEqual(controller.input.poll(),{throttle:0,brake:false,interact:false});
+  assert.equal(controller.advanceFrame(60001).steps,0,'resume must not catch up paused time');
+  assert.equal(controller.state.elapsedSeconds,initial.elapsedSeconds);
+  assert.equal(controller.state.energyRemainingUnits,initial.energyRemainingUnits);
+ }
+});
+check('only quadrupeds may select the bridge in running or paused sessions',()=>{
+ for(const chassis of ['chassis_wheel','chassis_track','chassis_quadruped'])for(const phase of ['running','paused'])for(const xM of [54,78]){
+  const state={...create({chassis}),phase,xM,speedMps:0};
+  const result=command(state,{kind:'route',sectionId:'bridge',route:'direct'});
+  assert.equal(result.accepted,chassis==='chassis_quadruped',JSON.stringify({chassis,phase,xM}));
+  if(!result.accepted)assert.deepEqual(result.state,state,'a blocked bridge choice must not change the session');
+  assert.equal(command(state,{kind:'route',sectionId:'bridge',route:'bypass'}).accepted,true);
+ }
+});
+check('bridge prompt catches moving arrivals and rearward reentry without repeating in one zone',()=>{
+ const {DrivingSessionController}=load('src/app/DrivingSessionController.ts');
+ for(const [xM,speedMps,direction] of [[52.8,4,1],[79.2,-4,-1]]){
+  const controller=new DrivingSessionController({...create(),xM,speedMps});
+  controller.advanceFrame(0);controller.input.setKey(direction>0?'d':'a',true);
+  let t=0;while(controller.state.phase==='running'&&t<3000)controller.advanceFrame(t+=34);
+  assert.equal(controller.pendingBridgeSectionId,'bridge');
+  assert.equal(controller.action({kind:'route',sectionId:'bridge',route:'bypass'}),true);
+  controller.advanceFrame(t+=34);
+  controller.advanceFrame(t+=34);assert.equal(controller.pendingBridgeSectionId,null,'same zone must not immediately reopen');
+  controller.input.setKey(direction>0?'d':'a',true);
+  while(t<5000&&Math.abs(controller.state.xM-xM)<4)controller.advanceFrame(t+=34);
+  assert.equal(controller.state.phase,'running');
+  controller.input.setKey(direction>0?'d':'a',false);controller.input.setKey(direction>0?'a':'d',true);
+  const deadline=t+12000;while(controller.state.phase==='running'&&t<deadline)controller.advanceFrame(t+=34);
+  assert.equal(controller.pendingBridgeSectionId,'bridge','reversing into the checkpoint must reopen the choice');
+ }
+ const moving={...create(),xM:54,speedMps:3};
+ assert.equal(command(moving,{kind:'route',sectionId:'bridge',route:'bypass'}).accepted,false);
+ assert.equal(command({...moving,phase:'paused'},{kind:'work'}).accepted,false);
+});
 check('one map, valid layout, real branch clearances',()=>{
 assert.equal('difficulty' in mission.challenge,false);
  assert.deepEqual(validateMission(mission,catalog,assets),{valid:true,issues:[]});
@@ -112,7 +167,7 @@ check('sand cannot be selected as a bypass; bridge is exclusive in both directio
 check('both junctions accept either direction after passing and reversing; branch interior is locked',()=>{
  const section=mission.environment.sections.find(s=>s.kind==='bridge'),b=E.bypassBounds(section);
  for(const direction of [1,-1])for(const x of [b.startM-2,b.startM,b.endM,b.endM+2]){
-  const base=create(),s={...base,xM:x,environment:{...base.environment,travelDirection:direction}};
+  const base=create({chassis:'chassis_quadruped'}),s={...base,xM:x,environment:{...base.environment,travelDirection:direction}};
   assert.equal(E.routePresentation(mission.environment,s.environment,x).junction?.id,section.id);
   for(const route of ['direct','bypass'])assert.equal(command(s,{kind:'route',sectionId:section.id,route}).accepted,true);
  }
@@ -120,7 +175,7 @@ check('both junctions accept either direction after passing and reversing; branc
   assert.equal(E.nearestJunction([section],x),undefined);
   assert.equal(command({...create(),xM:x},{kind:'route',sectionId:section.id,route:'bypass'}).accepted,false);
  }
- let s=go(create(),58);s=go(s,54);
+ let s=go(create({chassis:'chassis_quadruped'}),58);s=go(s,54);
  assert.equal(s.environment.travelDirection,-1);
  assert.equal(E.routePresentation(mission.environment,s.environment,s.xM).junction?.id,section.id);
  s=send(s,{kind:'route',sectionId:section.id,route:'bypass'});s=go(s,78);

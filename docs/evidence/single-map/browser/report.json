@@ -4,9 +4,9 @@
     "single map at root, normal by default, no difficulty picker",
     "legacy sample query cannot open another map",
     "one interaction button handles touch charging and replaces old operation buttons",
-    "route junction and direct choice preserve scene bounds on desktop, portrait and landscape",
-    "backtracking after missing the near junction restores route buttons without moving the scene",
-    "far junction can be selected while driving forward after reversing past it",
+    "bridge modal freezes gameplay, survives Escape, works by touch and preserves scene bounds on desktop and mobile",
+    "backtracking into the near checkpoint reopens the paused route choice",
+    "far checkpoint reopens on reverse and forward reentry",
     "low-power quadruped real keyboard drive across sand and arch, charge, clear, deliver, score",
     "desktop and mobile result actions remain visible and reachable",
     "new score survives reload",
@@ -18,8 +18,8 @@
   ],
   "exceptions": [],
   "consoleErrors": [],
-  "base": "http://127.0.0.1:64900",
-  "buildId": "build-53803a2c68cb-20261026092213881",
+  "base": "http://127.0.0.1:59926",
+  "buildId": "build-221911722bbe-20261026101638432",
   "repositoryLinks": [
     {
       "width": 1366,
@@ -262,18 +262,18 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 24.337186953200423,
-        "rimXM": 24.337186953200423,
-        "keyZM": 0.24001620916733374,
-        "rimZM": 0.24001620916733374
+        "keyXM": 24.348177218189125,
+        "rimXM": 24.348177218189125,
+        "keyZM": 0.2396083200985652,
+        "rimZM": 0.2396083200985652
       },
       "terrain": {
         "id": "transport-yard-ground",
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 24.337186953200423,
-      "robotZM": 0.24001620916733374
+      "robotXM": 24.348177218189125,
+      "robotZM": 0.2396083200985652
     },
     "desktop-cargo": {
       "viewport": {
@@ -294,18 +294,18 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 38.300861259198626,
-        "rimXM": 38.300861259198626,
-        "keyZM": 0.20000405636440755,
-        "rimZM": 0.20000405636440755
+        "keyXM": 38.30311803482332,
+        "rimXM": 38.30311803482332,
+        "keyZM": 0.2188958498059426,
+        "rimZM": 0.2188958498059426
       },
       "terrain": {
         "id": "transport-yard-ground",
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 38.300861259198626,
-      "robotZM": 0.20000405636440755
+      "robotXM": 38.30311803482332,
+      "robotZM": 0.2188958498059426
     },
     "mobile-interaction-charge": {
       "viewport": {
@@ -316,8 +316,8 @@
         "pixelRatio": 1,
         "cameraAspect": 0.8315565031982942
       },
-      "drawCalls": 279,
-      "triangles": 44794,
+      "drawCalls": 281,
+      "triangles": 44818,
       "resources": {
         "geometries": 225,
         "materials": 53,
@@ -326,18 +326,18 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 47.222892475372,
-        "rimXM": 47.222892475372,
-        "keyZM": 0.4087282889581811,
-        "rimZM": 0.4087282889581811
+        "keyXM": 47.10682379738119,
+        "rimXM": 47.10682379738119,
+        "keyZM": 0.4697528682812993,
+        "rimZM": 0.4697528682812993
       },
       "terrain": {
         "id": "transport-yard-ground",
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 47.222892475372,
-      "robotZM": 0.4087282889581811
+      "robotXM": 47.10682379738119,
+      "robotZM": 0.4697528682812993
     },
     "desktop-charger": {
       "viewport": {
@@ -348,8 +348,8 @@
         "pixelRatio": 1,
         "cameraAspect": 2.8783185840707963
       },
-      "drawCalls": 679,
-      "triangles": 101502,
+      "drawCalls": 680,
+      "triangles": 101514,
       "resources": {
         "geometries": 225,
         "materials": 53,
@@ -358,18 +358,18 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 47.22207303830636,
-        "rimXM": 47.22207303830636,
-        "keyZM": 0.4056793922599525,
-        "rimZM": 0.4056793922599525
+        "keyXM": 47.10663027546757,
+        "rimXM": 47.10663027546757,
+        "keyZM": 0.4690630971412896,
+        "rimZM": 0.4690630971412896
       },
       "terrain": {
         "id": "transport-yard-ground",
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 47.22207303830636,
-      "robotZM": 0.4056793922599525
+      "robotXM": 47.10663027546757,
+      "robotZM": 0.4690630971412896
     },
     "desktop-junction": {
       "viewport": {
@@ -380,8 +380,8 @@
         "pixelRatio": 1,
         "cameraAspect": 2.8783185840707963
       },
-      "drawCalls": 660,
-      "triangles": 97362,
+      "drawCalls": 672,
+      "triangles": 100644,
       "resources": {
         "geometries": 225,
         "materials": 53,
@@ -390,18 +390,18 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 54.39488482974492,
-        "rimXM": 54.39488482974492,
-        "keyZM": 0.44940000763218735,
-        "rimZM": 0.44940000763218735
+        "keyXM": 53.03316022454642,
+        "rimXM": 53.03316022454642,
+        "keyZM": 0.3875220870868662,
+        "rimZM": 0.3875220870868662
       },
       "terrain": {
         "id": "transport-yard-ground",
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 54.39488482974492,
-      "robotZM": 0.44940000763218735
+      "robotXM": 53.03316022454642,
+      "robotZM": 0.3875220870868662
     },
     "junction-390x844": {
       "viewport": {
@@ -412,8 +412,8 @@
         "pixelRatio": 1,
         "cameraAspect": 0.8315565031982942
       },
-      "drawCalls": 274,
-      "triangles": 48872,
+      "drawCalls": 266,
+      "triangles": 46546,
       "resources": {
         "geometries": 225,
         "materials": 53,
@@ -422,18 +422,18 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 54.39464904355655,
-        "rimXM": 54.39464904355655,
-        "keyZM": 0.44969112675664324,
-        "rimZM": 0.44969112675664324
+        "keyXM": 53.03316022454642,
+        "rimXM": 53.03316022454642,
+        "keyZM": 0.3875220870868662,
+        "rimZM": 0.3875220870868662
       },
       "terrain": {
         "id": "transport-yard-ground",
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 54.39464904355655,
-      "robotZM": 0.44969112675664324
+      "robotXM": 53.03316022454642,
+      "robotZM": 0.3875220870868662
     },
     "junction-844x390": {
       "viewport": {
@@ -444,8 +444,8 @@
         "pixelRatio": 1,
         "cameraAspect": 4.5133689839572195
       },
-      "drawCalls": 816,
-      "triangles": 114188,
+      "drawCalls": 818,
+      "triangles": 114500,
       "resources": {
         "geometries": 225,
         "materials": 53,
@@ -454,18 +454,50 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 54.39465176008304,
-        "rimXM": 54.39465176008304,
-        "keyZM": 0.44970637722612944,
-        "rimZM": 0.44970637722612944
+        "keyXM": 53.03316022454642,
+        "rimXM": 53.03316022454642,
+        "keyZM": 0.3875220870868662,
+        "rimZM": 0.3875220870868662
       },
       "terrain": {
         "id": "transport-yard-ground",
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 54.39465176008304,
-      "robotZM": 0.44970637722612944
+      "robotXM": 53.03316022454642,
+      "robotZM": 0.3875220870868662
+    },
+    "junction-320x568": {
+      "viewport": {
+        "width": 320,
+        "height": 193,
+        "drawingBufferWidth": 320,
+        "drawingBufferHeight": 193,
+        "pixelRatio": 1,
+        "cameraAspect": 1.6580310880829014
+      },
+      "drawCalls": 425,
+      "triangles": 68580,
+      "resources": {
+        "geometries": 225,
+        "materials": 53,
+        "textures": 33
+      },
+      "lighting": {
+        "environment": true,
+        "environmentIntensity": 0.65,
+        "keyXM": 53.03316022454642,
+        "rimXM": 53.03316022454642,
+        "keyZM": 0.3875220870868662,
+        "rimZM": 0.3875220870868662
+      },
+      "terrain": {
+        "id": "transport-yard-ground",
+        "maxSurfaceErrorM": 5.960464483090178e-9,
+        "loadingHeightM": 0
+      },
+      "robotXM": 53.03316022454642,
+      "robotZM": 0.3875220870868662
     },
     "desktop-junction-reverse": {
       "viewport": {
@@ -476,8 +508,8 @@
         "pixelRatio": 1,
         "cameraAspect": 2.8783185840707963
       },
-      "drawCalls": 670,
-      "triangles": 99200,
+      "drawCalls": 638,
+      "triangles": 93678,
       "resources": {
         "geometries": 225,
         "materials": 53,
@@ -486,18 +518,18 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 54.083507786905386,
-        "rimXM": 54.083507786905386,
-        "keyZM": 0.24800286405199726,
-        "rimZM": 0.24800286405199726
+        "keyXM": 54.99857582728535,
+        "rimXM": 54.99857582728535,
+        "keyZM": 0.342887787310011,
+        "rimZM": 0.342887787310011
       },
       "terrain": {
         "id": "transport-yard-ground",
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 54.083507786905386,
-      "robotZM": 0.24800286405199726
+      "robotXM": 54.99857582728535,
+      "robotZM": 0.342887787310011
     },
     "desktop-bridge": {
       "viewport": {
@@ -518,18 +550,18 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 65.86243795132094,
-        "rimXM": 65.86243795132094,
-        "keyZM": 0.45920357554600727,
-        "rimZM": 0.45920357554600727
+        "keyXM": 65.80990624955865,
+        "rimXM": 65.80990624955865,
+        "keyZM": 0.2839308928812341,
+        "rimZM": 0.2839308928812341
       },
       "terrain": {
         "id": "transport-yard-ground",
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 65.86243795132094,
-      "robotZM": 0.45920357554600727
+      "robotXM": 65.80990624955865,
+      "robotZM": 0.2839308928812341
     },
     "desktop-bridge-exit": {
       "viewport": {
@@ -540,8 +572,8 @@
         "pixelRatio": 1,
         "cameraAspect": 2.8783185840707963
       },
-      "drawCalls": 481,
-      "triangles": 72672,
+      "drawCalls": 465,
+      "triangles": 68512,
       "resources": {
         "geometries": 225,
         "materials": 53,
@@ -550,18 +582,18 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 78.0903349139862,
-        "rimXM": 78.0903349139862,
-        "keyZM": 0.24574941845529663,
-        "rimZM": 0.24574941845529663
+        "keyXM": 79.93655889257062,
+        "rimXM": 79.93655889257062,
+        "keyZM": 0.2785838544396599,
+        "rimZM": 0.2785838544396599
       },
       "terrain": {
         "id": "transport-yard-ground",
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 78.0903349139862,
-      "robotZM": 0.24574941845529663
+      "robotXM": 79.93655889257062,
+      "robotZM": 0.2785838544396599
     },
     "desktop-large-box": {
       "viewport": {
@@ -572,8 +604,8 @@
         "pixelRatio": 1,
         "cameraAspect": 2.8783185840707963
       },
-      "drawCalls": 370,
-      "triangles": 54490,
+      "drawCalls": 369,
+      "triangles": 54478,
       "resources": {
         "geometries": 225,
         "materials": 53,
@@ -584,16 +616,16 @@
         "environmentIntensity": 0.65,
         "keyXM": 84.15,
         "rimXM": 84.15,
-        "keyZM": 0.48530816405920185,
-        "rimZM": 0.48530816405920185
+        "keyZM": 0.23755467638772648,
+        "rimZM": 0.23755467638772648
       },
       "terrain": {
         "id": "transport-yard-ground",
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 84.14999999999999,
-      "robotZM": 0.48530816405920185
+      "robotXM": 84.15,
+      "robotZM": 0.23755467638772648
     },
     "desktop-cleared-box": {
       "viewport": {
@@ -604,8 +636,8 @@
         "pixelRatio": 1,
         "cameraAspect": 2.8783185840707963
       },
-      "drawCalls": 370,
-      "triangles": 54490,
+      "drawCalls": 369,
+      "triangles": 54478,
       "resources": {
         "geometries": 225,
         "materials": 53,
@@ -614,18 +646,18 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 84.14870017912659,
-        "rimXM": 84.14870017912659,
-        "keyZM": 0.49134586653906265,
-        "rimZM": 0.49134586653906265
+        "keyXM": 84.14794266332939,
+        "rimXM": 84.14794266332939,
+        "keyZM": 0.19999910688796885,
+        "rimZM": 0.19999910688796885
       },
       "terrain": {
         "id": "transport-yard-ground",
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 84.14870017912659,
-      "robotZM": 0.49134586653906265
+      "robotXM": 84.14794266332939,
+      "robotZM": 0.19999910688796885
     },
     "desktop-finish-approach": {
       "viewport": {
@@ -636,8 +668,8 @@
         "pixelRatio": 1,
         "cameraAspect": 2.8783185840707963
       },
-      "drawCalls": 302,
-      "triangles": 47502,
+      "drawCalls": 301,
+      "triangles": 47500,
       "resources": {
         "geometries": 225,
         "materials": 53,
@@ -646,18 +678,18 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 95.20016359016316,
-        "rimXM": 95.20016359016316,
-        "keyZM": 0.19998558933934832,
-        "rimZM": 0.19998558933934832
+        "keyXM": 95.31001750440635,
+        "rimXM": 95.31001750440635,
+        "keyZM": 0.5108008960042336,
+        "rimZM": 0.5108008960042336
       },
       "terrain": {
         "id": "transport-yard-ground",
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 95.20016359016316,
-      "robotZM": 0.19998558933934832
+      "robotXM": 95.31001750440635,
+      "robotZM": 0.5108008960042336
     },
     "desktop-result": {
       "viewport": {
@@ -680,8 +712,8 @@
         "environmentIntensity": 0.65,
         "keyXM": 100,
         "rimXM": 100,
-        "keyZM": 0.36985246025852014,
-        "rimZM": 0.36985246025852014
+        "keyZM": 0.42276972314802885,
+        "rimZM": 0.42276972314802885
       },
       "terrain": {
         "id": "transport-yard-ground",
@@ -689,7 +721,7 @@
         "loadingHeightM": 0
       },
       "robotXM": 100,
-      "robotZM": 0.36985246025852014
+      "robotZM": 0.42276972314802885
     },
     "result-actions-1366x900": {
       "viewport": {
@@ -712,8 +744,8 @@
         "environmentIntensity": 0.65,
         "keyXM": 100,
         "rimXM": 100,
-        "keyZM": 0.36985246025852014,
-        "rimZM": 0.36985246025852014
+        "keyZM": 0.42276972314802885,
+        "rimZM": 0.42276972314802885
       },
       "terrain": {
         "id": "transport-yard-ground",
@@ -721,7 +753,7 @@
         "loadingHeightM": 0
       },
       "robotXM": 100,
-      "robotZM": 0.36985246025852014
+      "robotZM": 0.42276972314802885
     },
     "result-actions-390x844": {
       "viewport": {
@@ -744,8 +776,8 @@
         "environmentIntensity": 0.65,
         "keyXM": 100,
         "rimXM": 100,
-        "keyZM": 0.36985246025852014,
-        "rimZM": 0.36985246025852014
+        "keyZM": 0.42276972314802885,
+        "rimZM": 0.42276972314802885
       },
       "terrain": {
         "id": "transport-yard-ground",
@@ -753,7 +785,7 @@
         "loadingHeightM": 0
       },
       "robotXM": 100,
-      "robotZM": 0.36985246025852014
+      "robotZM": 0.42276972314802885
     },
     "result-actions-844x390": {
       "viewport": {
@@ -776,8 +808,8 @@
         "environmentIntensity": 0.65,
         "keyXM": 100,
         "rimXM": 100,
-        "keyZM": 0.36985246025852014,
-        "rimZM": 0.36985246025852014
+        "keyZM": 0.42276972314802885,
+        "rimZM": 0.42276972314802885
       },
       "terrain": {
         "id": "transport-yard-ground",
@@ -785,7 +817,7 @@
         "loadingHeightM": 0
       },
       "robotXM": 100,
-      "robotZM": 0.36985246025852014
+      "robotZM": 0.42276972314802885
     },
     "mobile-configuration": {
       "viewport": {
@@ -838,8 +870,8 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 3.3562153904235803,
-        "rimXM": 3.3562153904235803,
+        "keyXM": 3.4298504694808463,
+        "rimXM": 3.4298504694808463,
         "keyZM": 0.4,
         "rimZM": 0.4
       },
@@ -848,7 +880,7 @@
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 3.3562153904235803,
+      "robotXM": 3.4298504694808463,
       "robotZM": 0.4
     },
     "mobile-390x844": {
@@ -860,8 +892,8 @@
         "pixelRatio": 1,
         "cameraAspect": 0.8315565031982942
       },
-      "drawCalls": 325,
-      "triangles": 55534,
+      "drawCalls": 324,
+      "triangles": 55522,
       "resources": {
         "geometries": 220,
         "materials": 53,
@@ -870,8 +902,8 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 4.909616334801384,
-        "rimXM": 4.909616334801384,
+        "keyXM": 4.976318953387284,
+        "rimXM": 4.976318953387284,
         "keyZM": 0.4,
         "rimZM": 0.4
       },
@@ -880,7 +912,7 @@
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 4.909616334801384,
+      "robotXM": 4.976318953387284,
       "robotZM": 0.4
     },
     "mobile-844x390": {
@@ -902,8 +934,8 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 5.667401803758249,
-        "rimXM": 5.667401803758249,
+        "keyXM": 5.557559741805251,
+        "rimXM": 5.557559741805251,
         "keyZM": 0.4,
         "rimZM": 0.4
       },
@@ -912,7 +944,7 @@
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 5.667401803758249,
+      "robotXM": 5.557559741805251,
       "robotZM": 0.4
     },
     "desktop-bypass-lighting": {
@@ -924,8 +956,8 @@
         "pixelRatio": 1,
         "cameraAspect": 2.8783185840707963
       },
-      "drawCalls": 747,
-      "triangles": 109336,
+      "drawCalls": 746,
+      "triangles": 109036,
       "resources": {
         "geometries": 220,
         "materials": 53,
@@ -934,8 +966,8 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 65.83862415279876,
-        "rimXM": 65.83862415279876,
+        "keyXM": 65.91209433223459,
+        "rimXM": 65.91209433223459,
         "keyZM": 6.329093086964351,
         "rimZM": 6.329093086964351
       },
@@ -944,7 +976,7 @@
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 65.83862415279876,
+      "robotXM": 65.91209433223459,
       "robotZM": 6.329093086964351
     },
     "mobile-bypass-lighting": {
@@ -956,8 +988,8 @@
         "pixelRatio": 1,
         "cameraAspect": 0.8315565031982942
       },
-      "drawCalls": 469,
-      "triangles": 81244,
+      "drawCalls": 471,
+      "triangles": 81856,
       "resources": {
         "geometries": 220,
         "materials": 53,
@@ -966,8 +998,8 @@
       "lighting": {
         "environment": true,
         "environmentIntensity": 0.65,
-        "keyXM": 65.83862415279876,
-        "rimXM": 65.83862415279876,
+        "keyXM": 65.91209433223459,
+        "rimXM": 65.91209433223459,
         "keyZM": 6.329093086964351,
         "rimZM": 6.329093086964351
       },
@@ -976,7 +1008,7 @@
         "maxSurfaceErrorM": 5.960464483090178e-9,
         "loadingHeightM": 0
       },
-      "robotXM": 65.83862415279876,
+      "robotXM": 65.91209433223459,
       "robotZM": 6.329093086964351
     }
   },
@@ -1025,14 +1057,14 @@
     ]
   },
   "run": {
-    "time": 125.4833333333275,
-    "energy": 35.596098289340716,
+    "time": 91.59999999999609,
+    "energy": 41.79136029095128,
     "result": {
       "outcome": "succeeded",
       "score": {
-        "formalScore": 3120,
-        "timeBonus": 302,
-        "energyBonus": 508,
+        "formalScore": 3398,
+        "timeBonus": 491,
+        "energyBonus": 597,
         "cargoBonus": 2000,
         "budgetBonus": 310
       }
@@ -1041,8 +1073,8 @@
   "bypassLighting": {
     "environment": true,
     "environmentIntensity": 0.65,
-    "keyXM": 65.83862415279876,
-    "rimXM": 65.83862415279876,
+    "keyXM": 65.91209433223459,
+    "rimXM": 65.91209433223459,
     "keyZM": 6.329093086964351,
     "rimZM": 6.329093086964351
   },

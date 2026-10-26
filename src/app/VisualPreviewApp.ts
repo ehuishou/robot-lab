@@ -62,7 +62,17 @@ export class VisualPreviewApp {
           <div class="viewport-caption"><span id="view-caption">灯光、材质与模块轮廓实时渲染</span><span id="terrain-caption"></span></div>
           <div class="camera-controls" role="group" aria-label="镜头控制"><button data-action="orbit-left" aria-label="向左旋转镜头">↶</button><button data-action="orbit-right" aria-label="向右旋转镜头">↷</button><button data-action="zoom-in" aria-label="拉近镜头">＋</button><button data-action="zoom-out" aria-label="拉远镜头">−</button><button data-action="loading">装载区</button><button data-action="delivery">交付区</button></div>
           <div id="hud-demo" class="hud-demo" hidden><div><span>任务时间 / 位置</span><strong id="hud-time"></strong></div><div><span>能源 / 速度</span><strong id="hud-energy"></strong><div class="energy-track"><i id="energy-fill"></i></div></div><div><span>运输目标</span><strong id="hud-objective"></strong></div><details id="physics-test" hidden><summary>物理测试</summary><button data-action="physics-push">轻推</button><button data-action="physics-topple">强推</button><button data-action="physics-reset">扶正</button><button data-action="physics-overlay" aria-pressed="false">显示受力</button><span id="physics-legend" hidden>橙：重心 · 青：支撑力 · 红：打滑</span></details><div id="interaction-prompt" class="control-legend" role="status" aria-live="polite"></div></div>
-          <div id="driving-panel" class="driving-panel" hidden><div class="driving-buttons" role="group" aria-label="驾驶操作"><div class="drive-cluster" role="group" aria-label="方向"><button data-drive="reverse" aria-label="按住倒退" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">←</span><span>倒退</span><kbd>A / ←</kbd></button><button data-drive="forward" aria-label="按住前进" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">→</span><span>前进</span><kbd>D / →</kbd></button></div><div class="drive-cluster drive-actions" role="group" aria-label="制动与交互"><button data-drive="brake" aria-label="按住刹车" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">▣</span><span>刹车</span><kbd>Space</kbd></button><button data-drive="interact" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">◇</span><span id="interaction-label">交互</span><kbd>E</kbd></button></div></div><div id="environment-controls" class="environment-controls" hidden><span id="route-status"></span><div class="route-choice" role="group" aria-label="选择路线"><button data-action="route-direct">↑ 直行</button><button data-action="route-bypass">↗ 走旁路 <small id="bypass-distance"></small></button></div></div><p><span>按住方向行驶 · 松开滑行</span><span>停稳后交互 · 装卸 / 充能 / 清障</span></p></div>
+          <div id="driving-panel" class="driving-panel" hidden><div class="driving-buttons" role="group" aria-label="驾驶操作"><div class="drive-cluster" role="group" aria-label="方向"><button data-drive="reverse" aria-label="按住倒退" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">←</span><span>倒退</span><kbd>A / ←</kbd></button><button data-drive="forward" aria-label="按住前进" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">→</span><span>前进</span><kbd>D / →</kbd></button></div><div class="drive-cluster drive-actions" role="group" aria-label="制动与交互"><button data-drive="brake" aria-label="按住刹车" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">▣</span><span>刹车</span><kbd>Space</kbd></button><button data-drive="interact" aria-pressed="false"><span class="drive-symbol" aria-hidden="true">◇</span><span id="interaction-label">交互</span><kbd>E</kbd></button></div></div><div id="environment-controls" class="environment-controls" hidden><span id="route-status"></span></div><p><span>按住方向行驶 · 松开滑行</span><span>停稳后交互 · 装卸 / 充能 / 清障</span></p></div>
+          <dialog id="bridge-route-dialog" class="bridge-route-dialog" aria-labelledby="bridge-route-title" aria-describedby="bridge-route-description">
+            <span class="bridge-route-eyebrow">路线选择 · 游戏已暂停</span>
+            <h2 id="bridge-route-title">拱桥还是旁路？</h2>
+            <p id="bridge-route-description">请选择接下来的路线。选择期间不计时、不耗电，车辆不会移动。</p>
+            <div class="bridge-route-options">
+              <button type="button" data-action="route-direct"><span class="bridge-route-icon" aria-hidden="true">↥</span><span><strong>走拱桥</strong><small>需要四足底盘</small><small id="bridge-route-requirement"></small></span></button>
+              <button type="button" data-action="route-bypass"><span class="bridge-route-icon" aria-hidden="true">↗</span><span><strong>走旁路</strong><small>路程更长 · 所有底盘可通行</small><small id="bypass-distance"></small></span></button>
+            </div>
+            <p class="bridge-route-footnote">选好后恢复游戏 · 按住方向继续行驶</p>
+          </dialog>
           <div id="pause-overlay" class="pause-overlay" hidden><h2>任务已暂停</h2><button class="primary" data-action="resume">继续驾驶</button><button data-action="retry">重新开始</button><button data-page="configuration">返回配置</button></div>
           <div id="result-demo" class="result-demo" hidden><h2 id="result-title">任务结算</h2><p id="result-reason"></p><div class="result-row"><span>货物交付</span><strong id="result-delivery"></strong></div><div class="result-row"><span>到达终点</span><strong id="result-finish"></strong></div><div class="result-row"><span>耗时 / 剩余能源</span><strong id="result-metrics"></strong></div><div id="challenge-result" class="challenge-result" hidden></div><p id="record-status" class="muted" role="status"></p><button data-action="retry-score">重试保存</button><div class="result-actions"><button class="primary" data-action="retry">重新挑战</button><button data-page="configuration">返回配置</button></div></div>
         </section>
@@ -79,6 +89,7 @@ export class VisualPreviewApp {
     root.addEventListener('nicknamechange',()=>{this.refresh();this.tutorial.openIfNeeded();},{signal:this.abort.signal});
     this.element('tutorial-button').addEventListener('click',()=>{if (!this.nicknameScores.nickname) this.nicknameScores.open(); else this.tutorial.open();},{signal:this.abort.signal});
     if (this.nicknameScores.nickname) this.tutorial.openIfNeeded();
+    this.element('bridge-route-dialog').addEventListener('cancel', event => event.preventDefault(), { signal: this.abort.signal });
     this.refresh();
   }
 
@@ -86,6 +97,7 @@ export class VisualPreviewApp {
     const state = this.controller?.state;
     return { buildId: this.buildId, testMode: TEST_MODE, page: this.page, category: this.category, configuration: { ...this.configuration },
       missionId: this.mission.id, validation: validateConfiguration(this.configuration, PREVIEW_MODULES, this.mission.configurationRules),
+      pendingBridgeSectionId: this.controller?.pendingBridgeSectionId ?? null,
       renderer: this.renderer.diagnostics, disposed: this.disposed, staticDemo: false,
       session: state ? { environment: state.environment, challenge: state.challenge, sessionId: state.sessionId, missionId: state.mission.id, phase: state.phase, xM: state.xM, speedMps: state.speedMps,
         heightM: state.heightM, slopeDegrees: state.slopeDegrees, quadruped: state.quadruped,
@@ -213,6 +225,7 @@ export class VisualPreviewApp {
     this.controller = null;
     this.root.dataset.playing = 'false';
     this.renderer.setSnapshot(null);
+    (this.element('bridge-route-dialog') as HTMLDialogElement).close();
     this.element('pause-overlay').hidden = true;
     this.element('session-toolbar').hidden = true;
   }
@@ -229,6 +242,7 @@ export class VisualPreviewApp {
     if (!this.controller || this.controller.state.phase !== 'running') return;
     const frame = this.controller.advanceFrame(timestampMs);
     if (frame.steps) this.renderer.setSnapshot(createRenderSnapshot(this.controller.state));
+    if (this.controller.pendingBridgeSectionId) { this.browserInput?.clear(); this.refreshSession(); return; }
     if (this.controller.state.result) {
       let saved: ReturnType<typeof saveChallengeResult> = 'unavailable';
       try { saved = saveChallengeResult(this.nicknameScores.storage(), this.controller.state); } catch { /* Storage may be disabled. */ }
@@ -251,6 +265,29 @@ export class VisualPreviewApp {
     void this.nicknameScores.submit(state,this.runNickname).then(message=>{if(!this.disposed && this.controller?.state.sessionId===state.sessionId){this.recordMessage=message;this.refreshSession();}});
   }
 
+  private refreshBridgeRouteDialog(): void {
+    const dialog = this.element('bridge-route-dialog') as HTMLDialogElement;
+    const state = this.controller?.state;
+    const section = state?.mission.environment?.sections.find(s => s.id === this.controller?.pendingBridgeSectionId);
+    if (!section || state?.phase !== 'paused') {
+      if (dialog.open) {
+        dialog.close();
+        this.root.querySelector<HTMLButtonElement>('[data-drive="forward"]')?.focus({ preventScroll: true });
+      }
+      return;
+    }
+    const quadruped = state.configuration.chassis === 'chassis_quadruped';
+    this.root.querySelector<HTMLButtonElement>('[data-action="route-direct"]')!.disabled = !quadruped;
+    this.root.querySelector<HTMLButtonElement>('[data-action="route-bypass"]')!.disabled = false;
+    this.element('bridge-route-requirement').textContent = quadruped ? '当前底盘可高效翻桥' : '当前底盘不支持，请走旁路';
+    this.element('bypass-distance').textContent = '比拱桥多 ' + section.extraM + ' 米';
+    if (!dialog.open) {
+      this.browserInput?.clear();
+      dialog.showModal();
+      this.root.querySelector<HTMLButtonElement>('[data-action="' + (quadruped ? 'route-direct' : 'route-bypass') + '"]')?.focus({ preventScroll: true });
+    }
+  }
+
   private refreshSession(): void {
     this.nicknameScores.update(this.controller?.state.phase==='running' || this.controller?.state.phase==='paused');
     this.root.querySelector<HTMLButtonElement>('#tutorial-button')!.disabled=!!this.controller;
@@ -258,7 +295,8 @@ export class VisualPreviewApp {
     this.element('hud-demo').hidden = !state || this.page !== 'world';
     this.element('driving-panel').hidden = !state || this.page !== 'world' || !!state.result;
     this.element('session-toolbar').hidden = !state || this.page !== 'world' || !!state.result;
-    this.element('pause-overlay').hidden = state?.phase !== 'paused';
+    this.element('pause-overlay').hidden = state?.phase !== 'paused' || !!this.controller?.pendingBridgeSectionId;
+    this.refreshBridgeRouteDialog();
     this.element('result-demo').hidden = !state?.result || this.page !== 'result';
     this.element('physics-test').hidden = !TEST_MODE || !state?.quadruped;
     this.element('environment-controls').hidden = !state?.environment;
@@ -268,21 +306,14 @@ export class VisualPreviewApp {
       const work=env.work, sensed=senseEnvironment(state.mission.environment,env,state.xM,state.speedMps<-.1?-1:1);
       const choice=presentation.choice==='bypass'?'旁路':'直行';
       const status=work ? (work.kind==='charge'?'充电中':work.kind==='clear'?'清障中':work.kind==='load'?'装载中':'卸货中')
-        :junction ? junction.label+' · '+(Math.abs(state.speedMps)>.75?'减速选路':'已选'+choice)
+        :junction ? junction.label+' · '+(this.controller?.pendingBridgeSectionId?'暂停选路':'已选'+choice)
         :presentation.active ? presentation.active.label+' · 已选'+choice
         :presentation.section ? (presentation.merged?'已汇入主路 · ':'')+presentation.section.label+' '+presentation.distanceM.toFixed(0)+'m · '+(hasBypass(presentation.section)?'旁路 +'+presentation.section.extraM+'m':'必经路段')
         :presentation.merged ? '已汇入主路'
         :env.blocked || (sensed?sensed.section.label+' '+sensed.distanceM.toFixed(0)+'m':'行程 '+env.distanceM.toFixed(0)+'m');
       this.element('route-status').textContent=status;
-      this.element('bypass-distance').textContent=presentation.section&&hasBypass(presentation.section)&&presentation.section.kind!=='charger'?'+'+presentation.section.extraM+'m':'';
       this.element('environment-controls').dataset.routeState=junction?'junction':presentation.active?'active':presentation.section?'approach':'idle';
       this.element('environment-controls').dataset.choice=presentation.choice??'direct';
-      const directButton=this.root.querySelector<HTMLButtonElement>('[data-action="route-direct"]')!;
-      const bypassButton=this.root.querySelector<HTMLButtonElement>('[data-action="route-bypass"]')!;
-      directButton.textContent='↑ 四足翻桥';
-      bypassButton.hidden=!junction||!hasBypass(junction);
-      directButton.hidden=!junction;
-      for(const action of ['route-direct','route-bypass']) {const b=this.root.querySelector<HTMLButtonElement>('[data-action="'+action+'"]')!;b.dataset.sectionId=junction?.id??'';b.disabled=state.phase!=='running'||!!work||!junction||Math.abs(state.speedMps)>.75;b.setAttribute('aria-pressed',String(!!presentation.section&&presentation.choice===(action==='route-direct'?'direct':'bypass')))}
     }
     if(state.quadruped) {
       for(const b of this.root.querySelectorAll<HTMLButtonElement>('#physics-test button')) b.disabled = state.phase !== 'running';
@@ -319,7 +350,7 @@ export class VisualPreviewApp {
       (state.xM>=bridgeBounds.startM-8 && state.xM<=bridgeBounds.startM)
       || (state.xM>=bridgeBounds.endM && state.xM<=bridgeBounds.endM+8));
     const atBridgeJunction = bridge && state.environment && routePresentation(state.mission.environment!,state.environment,state.xM).junction?.id===bridge.id;
-    const routeHint = atBridgeJunction ? '分岔检测点：前进或倒车均可选路，减速后选择直行或旁路' : approachingBridge ? (state.configuration.chassis==='chassis_quadruped' ? '前方分岔：四足可直行翻桥，或选平地旁路' : '前方分岔：请减速选择平地旁路，拱桥仅限四足') : null;
+    const routeHint = atBridgeJunction ? '分岔检测点：前进或倒车均可选路，到达后暂停并弹窗选择' : approachingBridge ? (state.configuration.chassis==='chassis_quadruped' ? '前方分岔：四足可直行翻桥，或选平地旁路' : '前方分岔：到达后弹窗选路，拱桥仅限四足') : null;
     const finishHint = state.xM>=this.mission.layout.find(item=>item.kind==='deliveryZone')!.startM ? '终点 '+this.finishObjective.xM+' m · 继续前进，驶过终点结算' : null;
     const prompt = interaction?.kind === 'deliver' ? 'E / 交互：卸货到交付平台' : interaction?.kind === 'pickup' ? `E / 交互：装载 ${interactionCargo?.cargo.massKg ?? ''} kg 货箱`
       : state.phase === 'paused' ? '任务已暂停'

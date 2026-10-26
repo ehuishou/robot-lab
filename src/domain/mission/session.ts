@@ -165,15 +165,20 @@ function applyCommand(state: SessionState, command: SessionCommand, deferSettlem
     if (state.phase !== 'paused') return reject('inactiveSession');
     next = { ...state, phase: 'running' };
     emit('resumed');
+  } else if (command.kind === 'route') {
+    if (state.phase !== 'running' && state.phase !== 'paused') return reject('inactiveSession');
+    if (!state.environment || !state.mission.environment || state.environment.work || !['direct','bypass'].includes(command.route)) return reject('invalidCommand');
+    const section = nearestJunction(state.mission.environment.sections.filter(s=>s.id===command.sectionId),state.xM);
+    if (!section || section.id !== command.sectionId) return reject('outOfRange');
+    // A bridge decision freezes motion, so choosing does not require braking first.
+    // Other paused actions and ordinary moving route changes keep their safety guards.
+    if (state.phase === 'paused' ? section.kind !== 'bridge' : Math.abs(state.speedMps) > .75) return reject('invalidCommand');
+    if (section.kind === 'bridge' && command.route === 'direct' && state.configuration.chassis !== 'chassis_quadruped') return reject('invalidCommand');
+    next = {...state,environment:{...state.environment,choices:{...state.environment.choices,[section.id]:command.route}}};
+    emit('advanced');
   } else {
     if (state.phase !== 'running') return reject('inactiveSession');
-    if (command.kind === 'route') {
-      if (!state.environment || !state.mission.environment || Math.abs(state.speedMps)>.75 || state.environment.work || !['direct','bypass'].includes(command.route)) return reject('invalidCommand');
-      const section = nearestJunction(state.mission.environment.sections.filter(s=>s.id===command.sectionId),state.xM);
-      if (!section || section.id !== command.sectionId) return reject('outOfRange');
-      next = {...state,environment:{...state.environment,choices:{...state.environment.choices,[section.id]:command.route}}};
-      emit('advanced');
-    } else if (command.kind === 'assist') {
+    if (command.kind === 'assist') {
       if (!state.environment || typeof command.enabled!=='boolean') return reject('invalidCommand');
       next={...state,environment:{...state.environment,assist:command.enabled}};emit('advanced');
     } else if (command.kind === 'stage') {

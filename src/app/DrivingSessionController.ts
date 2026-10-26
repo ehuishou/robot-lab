@@ -1,3 +1,4 @@
+import { nearestJunction, bypassBounds } from '../domain/simulation/environment';
 import { findNearbyInteraction } from '../domain/mission/nearbyInteraction';
 import { transitionSession } from '../domain/mission/session';
 import type { DomainEvent, SessionCommand, SessionState } from '../domain/mission/session';
@@ -10,6 +11,26 @@ export class DrivingSessionController {
   private readonly clock = new FixedStepClock();
   private current: SessionState;
   private commandSequence: number;
+  private pendingBridge: string | null = null;
+  private handledBridgeJunction: string | null = null;
+
+  get pendingBridgeSectionId(): string | null { return this.pendingBridge; }
+
+  private checkBridgeJunction(): readonly DomainEvent[] {
+    const state = this.current;
+    if (state.phase !== 'running' || !state.environment || !state.mission.environment) return [];
+    const section = nearestJunction(state.mission.environment.sections, state.xM);
+    if (section?.kind !== 'bridge') {
+      this.handledBridgeJunction = null;
+      return [];
+    }
+    const bounds = bypassBounds(section);
+    const key = section.id + (state.xM < (bounds.startM + bounds.endM) / 2 ? ':start' : ':end');
+    if (this.handledBridgeJunction === key || state.environment.work) return [];
+    this.handledBridgeJunction = key;
+    this.pendingBridge = section.id;
+    return this.pause();
+  }
 
   constructor(state: SessionState) {
     this.current = state;
@@ -28,7 +49,7 @@ export class DrivingSessionController {
   }
 
   resume(): readonly DomainEvent[] {
-    if (this.current.phase !== 'paused') return [];
+    if (this.current.phase !== 'paused' || this.pendingBridge) return [];
     const events = this.apply({ kind: 'resume' });
     this.input.setEnabled(true);
     this.clock.reset();
@@ -36,8 +57,8 @@ export class DrivingSessionController {
   }
 
   advanceFrame(timestampMs: number): Readonly<{ steps: number; discardedSeconds: number; events: readonly DomainEvent[] }> {
+    const events: DomainEvent[] = [...this.checkBridgeJunction()];
     const frame = this.clock.advance(timestampMs, this.current.phase === 'running');
-    const events: DomainEvent[] = [];
     let steps = 0;
     for (; steps < frame.steps && this.current.phase === 'running'; steps++) {
       const intent = this.input.poll();
@@ -45,6 +66,7 @@ export class DrivingSessionController {
       if (interaction?.kind === 'work' || interaction?.kind === 'stage') this.action(interaction);
       events.push(...this.apply({ kind: 'drive', deltaSeconds: DRIVING_STEP_SECONDS, intent,
         interactions: interaction?.kind === 'pickup' || interaction?.kind === 'deliver' ? [interaction] : [] }));
+      events.push(...this.checkBridgeJunction());
     }
     if (this.current.phase !== 'running') {
       this.input.setEnabled(false);
@@ -60,9 +82,15 @@ export class DrivingSessionController {
   }
 
   action(command: {kind:'route';sectionId:string;route:'direct'|'bypass'} | {kind:'work'} | {kind:'stage';cargoIds:readonly string[]} | {kind:'assist';enabled:boolean}): boolean {
+    if (this.pendingBridge && (command.kind !== 'route' || command.sectionId !== this.pendingBridge)) return false;
     const result=transitionSession(this.current,{...command,sessionId:this.current.sessionId,commandId:this.current.sessionId+':action:'+(++this.commandSequence)});
     if (!result.accepted) return false;
-    this.current=result.state;return true;
+    this.current=result.state;
+    if (this.pendingBridge && command.kind === 'route') {
+      this.pendingBridge = null;
+      this.resume();
+    }
+    return true;
   }
 
   private apply(command: Omit<Extract<SessionCommand, { kind: 'drive' }>, 'sessionId' | 'commandId'> | { kind: 'pause' | 'resume' } | { kind: 'physicsTest'; action: 'push' | 'topple' | 'reset' }): readonly DomainEvent[] {

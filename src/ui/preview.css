@@ -167,3 +167,22 @@ body:has(#map-tutorial[open]){overflow:hidden}
 
 /* Repository access in the page footer. */
 .preview-footer .github-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:44px;min-height:44px;margin-right:auto;padding:0 10px;border:1px solid transparent;border-radius:6px;color:var(--muted);text-decoration:none;font-size:12px}.preview-footer .github-link svg{flex-shrink:0}.preview-footer .github-link:hover{color:var(--cyan);background:#163342;border-color:var(--line)}.preview-footer .github-link:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+
+/* Route decisions overlay the world without resizing the driving viewport. */
+.bridge-route-dialog{box-sizing:border-box;width:min(520px,calc(100vw - 28px));max-height:calc(100dvh - 32px);margin:auto;padding:26px;background:#102435;border:1px solid #83e5e9;border-radius:12px;color:#e1ebf4;box-shadow:0 24px 70px #020b15b3;overflow-y:auto;overscroll-behavior:contain}
+.bridge-route-dialog::backdrop{background:#06121dc7}
+.bridge-route-eyebrow{font-size:12px;font-weight:700;color:#83e5e9;letter-spacing:.08em}
+.bridge-route-dialog h2{margin:12px 0;font-size:24px}
+.bridge-route-dialog p{color:var(--muted);font-size:13px;line-height:1.7;margin:0 0 20px}
+.bridge-route-options{display:grid;gap:12px}
+.bridge-route-options button{display:flex;align-items:center;gap:16px;width:100%;min-height:88px;padding:14px 18px;text-align:left;white-space:normal;background:#19364a;border:1px solid #58768a;border-radius:8px;touch-action:manipulation}
+.bridge-route-options button:hover:not(:disabled){background:#23485c;border-color:#83e5e9}
+.bridge-route-options button:focus-visible{outline:3px solid #83e5e9;outline-offset:3px}
+.bridge-route-options button:active:not(:disabled){background:#2b5365}
+.bridge-route-options button:disabled{opacity:.55;cursor:not-allowed}
+.bridge-route-icon{font-size:30px;color:#83e5e9;flex:0 0 32px;text-align:center}
+.bridge-route-options strong,.bridge-route-options small{display:block}
+.bridge-route-options strong{font-size:17px;color:#edf7fb}
+.bridge-route-options small{font-size:12px;line-height:1.6;color:#b8cdd9}
+.bridge-route-dialog .bridge-route-footnote{font-size:12px;margin:18px 0 0}
+@media(max-width:480px),(max-height:480px){.bridge-route-dialog{padding:18px}.bridge-route-dialog h2{font-size:21px;margin:8px 0}.bridge-route-dialog p{margin-bottom:12px}.bridge-route-options{gap:10px}.bridge-route-options button{min-height:80px;padding:10px 14px}.bridge-route-dialog .bridge-route-footnote{margin-top:12px}}

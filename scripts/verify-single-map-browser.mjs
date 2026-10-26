@@ -90,9 +90,12 @@ try {
   const key=(key,down)=>send('Input.dispatchKeyEvent',{type:down?'keyDown':'keyUp',key,code:key===' '?'Space':'Key'+key.toUpperCase()});
   let held=null;
   async function hold(action){if(action===held)return;if(held)await key(held,false);held=action;if(action)await key(action,true);}
-  async function go(target){const deadline=Date.now()+90000;while(Date.now()<deadline){
+  async function go(target,expectJunction=false){const deadline=Date.now()+90000;while(Date.now()<deadline){
     const s=(await diagnostics()).session;if(target===100&&s.phase==='succeeded'){await hold(null);return;}
-    assert.equal(s.phase,'running',JSON.stringify(s.result));
+    if(expectJunction&&s.phase==='paused'&&(await diagnostics()).pendingBridgeSectionId){
+      await hold(null);assert.ok(Math.abs(target-s.xM)<2.1,JSON.stringify({target,x:s.xM}));return;
+    }
+    assert.equal(s.phase,'running',JSON.stringify({target,x:s.xM,result:s.result}));
     const d=target-s.xM,v=s.speedMps;
     if(target!==100&&Math.abs(d)<.35&&Math.abs(v)<.12){await hold(null);return;}
     const brake=target!==100&&(Math.abs(d)<v*v/7+.2 || d*v<-.1);
@@ -140,7 +143,7 @@ try {
   await click('[data-module="chassis_quadruped"]');await click('[data-category="motor"]');await click('[data-module="motor_low"]');
   assert.equal((await diagnostics()).validation.valid,true);
   await click('[data-action="start"]');await go(24);await shot('desktop-sand');
-  assert.equal(await evaluate('document.querySelector("[data-action=route-bypass]").hidden'),true);
+  assert.equal(await evaluate('document.querySelector("#bridge-route-dialog").open'),false);
   await go(38);await interact();assert.equal((await diagnostics()).session.cargo.carried.length,1);await shot('desktop-cargo');
   await go(47);
   await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
@@ -155,30 +158,55 @@ try {
     boxes.push(await evaluate('(()=>{const r=document.getElementById("three-viewport").getBoundingClientRect();return {y:r.y,h:r.height}})()'));
     assert.ok(boxes.at(-1).h>=130,JSON.stringify({width,height,scene:boxes.at(-1)}));
   }await send('Emulation.setDeviceMetricsOverride',{width:1366,height:900,deviceScaleFactor:1,mobile:false});return boxes;}
+  async function chooseRoute(route,touch=false){
+    assert.equal((await diagnostics()).session.phase,'paused');
+    const selector='[data-action="route-'+route+'"]';
+    const point=await evaluate('(()=>{const b=document.querySelector('+JSON.stringify(selector)+');if(b.disabled)throw Error("disabled route");const r=b.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}})()');
+    if(touch){
+      await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point]});await delay(80);
+      await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    }else{
+      await send('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});
+      await send('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});
+    }
+    await until(async()=>(await diagnostics()).session.phase==='running');
+    assert.equal((await diagnostics()).session.environment.choices.bridge,route);
+    assert.equal(await evaluate('document.querySelector("#bridge-route-dialog").open'),false);
+  }
   await go(51);const before=await routeBoxes();
   assert.ok((await evaluate('document.getElementById("interaction-prompt").textContent')).includes('分岔'));
-  await go(54);const during=await routeBoxes();
-  await click('[data-action="route-direct"]');await shot('desktop-junction');
-  for(const [width,height] of sizes.slice(1)){
+  await go(54,true);const during=await routeBoxes();
+  assert.equal(await evaluate('document.querySelector("#bridge-route-dialog").open'),true);
+  assert.equal(await evaluate('document.querySelector("#pause-overlay").hidden'),true);
+  const frozen=(await diagnostics()).session;await delay(1200);
+  assert.deepEqual((await diagnostics()).session,frozen,'route modal freezes time, energy and motion');
+  await key('Escape',true);await key('Escape',false);
+  assert.equal(await evaluate('document.querySelector("#bridge-route-dialog").open'),true);
+  await key('d',true);await delay(250);await key('d',false);assert.deepEqual((await diagnostics()).session,frozen);
+  await shot('desktop-junction');
+  for(const [width,height] of [...sizes.slice(1),[320,568]]){
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await delay(150);
+    const layout=await evaluate('(()=>{const d=document.querySelector("#bridge-route-dialog");return{open:d.open,overflow:document.documentElement.scrollWidth>innerWidth+1,buttons:[...d.querySelectorAll("button")].map(b=>{const r=b.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}})}})()');
+    assert.ok(layout.open&&!layout.overflow);assert.ok(layout.buttons.every(b=>b.x>=0&&b.y>=0&&b.w>=44&&b.h>=44&&b.right<=width&&b.bottom<=height),JSON.stringify(layout));
     await shot('junction-'+width+'x'+height);
   }
+  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  await send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:5});
+  await chooseRoute('direct',true);
   await send('Emulation.setDeviceMetricsOverride',{width:1366,height:900,deviceScaleFactor:1,mobile:false});
+  await send('Emulation.setTouchEmulationEnabled',{enabled:false});
   await go(56);const after=await routeBoxes();
   assert.deepEqual(during,before);assert.deepEqual(after,before);report.routeBounds={before,during,after};
-  pass('route junction and direct choice preserve scene bounds on desktop, portrait and landscape');
-  await go(54);
-  assert.ok((await evaluate('document.getElementById("interaction-prompt").textContent')).includes('\u524d\u8fdb\u6216\u5012\u8f66'));
-  await click('[data-action="route-bypass"]');assert.equal((await diagnostics()).session.environment.choices.bridge,'bypass');
-  await click('[data-action="route-direct"]');assert.deepEqual(await routeBoxes(),before);
-  await shot('desktop-junction-reverse');
-  pass('backtracking after missing the near junction restores route buttons without moving the scene');
+  pass('bridge modal freezes gameplay, survives Escape, works by touch and preserves scene bounds on desktop and mobile');
+  await go(54,true);await shot('desktop-junction-reverse');
+  await chooseRoute('direct');
+  pass('backtracking into the near checkpoint reopens the paused route choice');
   await go(66);await shot('desktop-bridge');
-  assert.ok((await diagnostics()).session.heightM>.7);await go(78);await shot('desktop-bridge-exit');
-  await go(76);await go(78);
-  await click('[data-action="route-bypass"]');assert.equal((await diagnostics()).session.environment.choices.bridge,'bypass');
-  await click('[data-action="route-direct"]');
-  pass('far junction can be selected while driving forward after reversing past it');
+  assert.ok((await diagnostics()).session.heightM>.7);
+  await go(78,true);await chooseRoute('direct');await go(80);await shot('desktop-bridge-exit');
+  await go(78,true);await chooseRoute('direct');await go(76);
+  await go(78,true);await chooseRoute('bypass');
+  pass('far checkpoint reopens on reverse and forward reentry');
   await go(84.15);await shot('desktop-large-box');await touchInteraction('清障');assert.equal((await diagnostics()).session.environment.removed.debris,1);await shot('desktop-cleared-box');
   await go(95);await interact();assert.equal((await diagnostics()).session.cargo.delivered.length,1);
   await until(async()=>(await evaluate('document.getElementById("interaction-prompt").textContent')).includes('终点'));
@@ -226,7 +254,10 @@ try {
   // Drive the actual branch before checking that lighting follows its lateral offset.
   await send('Emulation.setDeviceMetricsOverride',{width:1366,height:900,deviceScaleFactor:1,mobile:false});
   await click('[data-action="recommended"]');await click('[data-action="start"]');
-  await go(54);await click('[data-action="route-bypass"]');await go(66);
+  await go(54,true);
+  assert.equal(await evaluate('document.querySelector("[data-action=route-direct]").disabled'),true);
+  assert.ok((await evaluate('document.querySelector("#bridge-route-requirement").textContent')).includes('不支持'));
+  await chooseRoute('bypass');await go(66);
   await click('[data-action="pause"]');await shot('desktop-bypass-lighting');
   const branch=(await diagnostics()).renderer;
   assert.ok(Math.abs(branch.robotZM)>2,'robot must actually be on the branch');
